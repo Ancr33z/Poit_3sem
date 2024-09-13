@@ -59,7 +59,7 @@ namespace Log
 
 	void WriteOut(LOG log, In::IN in) {
 		wcout << *log.outfile << "\n\n";
-		*log.outStream << in.text << in.size << endl;
+		*log.outStream << in.text << endl;
 	}
 
 	void WriteParm(LOG log, Parm::PARM parm)
@@ -95,7 +95,7 @@ namespace Log
 		else
 		{
 			(*log.stream) << "Ошибка " << error.id << ": " << error.message << "\n"
-				<< "Строка" << error.inext.line << ", позиция: " << error.inext.col;
+				<< "Строка: " << error.inext.line << ", позиция: " << error.inext.col;
 		}
 		log.stream->close();
 		(*log.outStream).close();

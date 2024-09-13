@@ -273,6 +273,7 @@ class Program
 
         //------
 
+
         (int number, string greeting, char initial, string place, ulong bigNumber) = tuple;
 
         Console.WriteLine($"Число: {number}, Приветствие: {greeting}, Инициал: {initial}, Место: {place}, Большое число: {bigNumber}");
