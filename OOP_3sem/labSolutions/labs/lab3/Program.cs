@@ -1,59 +1,70 @@
 ﻿using System;
-using lab3;
+using System.Linq;
+using static OneDimensionalArray;
 
-namespace lab3
+public class Program
 {
-    public class Program
+    public static void Main()
     {
-        public static void Main()
+        ////////////////////////////////////// Инициализация массивов и вывод их на экран //////////////////////////////////////
+
+        OneDimensionalArray array1 = new OneDimensionalArray(5);
+
+        Console.WriteLine($"Первый массив: ");
+        for (int i = 0; i < 5; i++)
         {
-            // Инициализация объектов классов Production и Developer
-            MyArray<int>.Production production1 = new MyArray<int>.Production("Tech Corp");
-            MyArray<int>.Developer developer1 = new MyArray<int>.Developer("Антон", "Software Development");
-
-            // Вывод информации о производстве
-            Console.WriteLine("Информация о производстве:");
-            Console.WriteLine($"Название организации: {production1.OrganisationName}");
-
-            // Вывод информации о разработчике
-            Console.WriteLine("\nИнформация о разработчике:");
-            Console.WriteLine($"Имя: {developer1.Name}");
-            Console.WriteLine($"Отдел: {developer1.Department}");
-
-            // Тестирование перегруженных операций с MyArray<int>
-            MyArray<int> array1 = new MyArray<int>(5);
-            MyArray<int> array2 = new MyArray<int>(5);
-
-            // Заполняем массивы значениями
-            for (int i = 0; i < 5; i++)
-            {
-                array1.SetElement(i, i + 1);  // Массив [1, 2, 3, 4, 5]
-                array2.SetElement(i, i + 6);  // Массив [6, 7, 8, 9, 10]
-            }
-
-            // Перегруженная операция "+"
-            MyArray<int> combinedArray = array1 + array2;
-            Console.WriteLine("\nРезультат сложения двух массивов:");
-            for (int i = 0; i < combinedArray.Size(); i++)
-            {
-                Console.Write($"{combinedArray.GetElement(i)} ");
-            }
-
-            // Перегруженная операция "!="
-            bool areNotEqual = array1 != array2;
-            Console.WriteLine($"\n\nМассивы array1 и array2 не равны: {areNotEqual}");
-
-            // Перегруженная операция ">" (проверка вхождения элемента)
-            bool containsValue = array1 > 3;  // Проверяем, содержится ли число 3 в array1
-            Console.WriteLine($"Массив array1 содержит элемент 3: {containsValue}");
-
-            // Перегруженная операция "-"
-            MyArray<int> subtractedArray = array1 - 2;  // Вычитаем 2 из каждого элемента массива
-            Console.WriteLine("\nРезультат вычитания 2 из каждого элемента массива array1:");
-            for (int i = 0; i < subtractedArray.Size(); i++)
-            {
-                Console.Write($"{subtractedArray.GetElement(i)} ");
-            }
+            array1[i] = i + 1; // {1, 2, 3, 4, 5}
+            Console.Write($"{array1[i]} ");
         }
+
+        Console.WriteLine();
+        Console.WriteLine();
+
+        Console.WriteLine($"Второй массив: ");
+        OneDimensionalArray array2 = new OneDimensionalArray(3);
+        for (int i = 0; i < 3; i++)
+        {
+            array2[i] = i + 6; // {6, 7, 8}
+            Console.Write($"{array2[i]} ");
+        }
+
+        Console.WriteLine();
+
+        ////////////////////////////////////// Проверка работы перегруженных операций для массивов  //////////////////////////////////////
+
+        Console.WriteLine();
+        OneDimensionalArray array3 = array1 + array2; // Объединение массивов
+        Console.WriteLine("Объединенный массив: " + string.Join(", ", array3._array));
+
+        var resultArray = array1 - 2; // Разность с 2
+        Console.WriteLine("Разность с 2 первого массива: " + string.Join(", ", resultArray._array));
+
+        Console.WriteLine("Содержит ли первый массив 3? " + (array1 > 3));
+
+        Console.WriteLine("Массивы не равны? " + (array1 != array2));
+
+        Console.WriteLine("Сумма элементов первого массива: " + OneDimensionalArray.StatisticOperation.Sum(array1));
+        Console.WriteLine("Разница между макс и мин элементов первого массива: " + OneDimensionalArray.StatisticOperation.Difference(array1));
+        Console.WriteLine("Количество элементов первого массива: " + OneDimensionalArray.StatisticOperation.Count(array1));
+
+        ////////////////////////////////////// 2 Задание (инициализация класса Production и вывод на экран) //////////////////////////////////////
+
+        Console.WriteLine();
+        OneDimensionalArray.Production prod = new OneDimensionalArray.Production(25, "NewCompany");
+        Console.WriteLine($"Id компании: {prod.Id}, название компании: {prod.OrganizationName}");
+
+        ////////////////////////////////////// 3 Задание (инициализация класса Developerи вывод на экран) //////////////////////////////////////
+
+        Console.WriteLine();
+        OneDimensionalArray.Developer programer = new OneDimensionalArray.Developer("Borisov N. A.", 1, "SoftWare");
+        Console.WriteLine($"Имя разработчика : {programer.FullName}, Id программиста: {programer.Id}, отдел работы: {programer.Department}");
+
+        ////////////////////////////////////// Проверка работы расширений для строк (5 задание) //////////////////////////////////////
+
+        Console.WriteLine();
+        string testString = "Hello World!";
+        Console.WriteLine($"Начальная строка {testString}");
+        Console.WriteLine("Строка без гласных: " + StatisticOperation.RemoveVowels(testString));
+        Console.WriteLine("Строка без первых пяти элементов: " + StatisticOperation.RemoveFirstFiveElements(testString));
     }
 }

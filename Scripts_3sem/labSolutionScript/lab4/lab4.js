@@ -135,6 +135,7 @@ function updatePrice(id, newPrice) {
 function getProductCount() {
     return products1.size;
 }
+
 function getTotalPrice() {
     let totalPrice = 0;
     for (const product1 of products1.values()) {
