@@ -59,7 +59,6 @@ void BFS(int start)
     bool visited[n];
     bool inqueue[n];
     int view_cell; // номер посещаемой вершины
-
     for (int i = 0; i < n; i++)
     {
         visited[i] = inqueue[i] = false;//значально все вершины считаются непосещёнными.
@@ -160,8 +159,8 @@ int main()
     BFS(start_2 - 1);
     cout << endl;
 
-    cout << "\nО-большое для поиска в глубину и ширину : O(|V| + |E|)  " << endl;
-    cout << "\nО-большое по смежности матрицы : O((|V|)^2)  " << endl;
+    cout << "\nО-большое для поиска в глубину и ширину : O(|V| + |E|)  или " << n + 11 << endl;
+    cout << "\nО-большое по смежности матрицы : O((|V|)^2) или  " << n * n << endl;
 
 
 

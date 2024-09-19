@@ -66,5 +66,8 @@ public class Program
         Console.WriteLine($"Начальная строка {testString}");
         Console.WriteLine("Строка без гласных: " + StatisticOperation.RemoveVowels(testString));
         Console.WriteLine("Строка без первых пяти элементов: " + StatisticOperation.RemoveFirstFiveElements(testString));
+
+        Console.WriteLine("Нажмите любую клавишу для выхода...");
+        Console.ReadKey();
     }
 }
