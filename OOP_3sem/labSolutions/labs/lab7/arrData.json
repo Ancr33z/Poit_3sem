@@ -1,0 +1,22 @@
+[
+    {
+        "PI": 3.1415,
+        "Name": "Circle1",
+        "Radius": 10
+    },
+    {
+        "PI": 3.1415,
+        "Name": "Circle2",
+        "Radius": 15
+    },
+    {
+        "PI": 3.1415,
+        "Name": "Circle3",
+        "Radius": 20
+    },
+    {
+        "PI": 3.1415,
+        "Name": "Circle4",
+        "Radius": 25
+    }
+]
