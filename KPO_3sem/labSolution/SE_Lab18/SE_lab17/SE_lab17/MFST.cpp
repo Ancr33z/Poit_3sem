@@ -45,7 +45,7 @@ namespace MFST
 		lex = lextable;
 		lenta = new short[lenta_size = lex.size];
 		for (int k = 0; k < lenta_size; k++)
-			lenta[k] = GRB::Rule::Chain::T(lex.table[k].lexema[0]);
+			lenta[k] = GRB::Rule::Chain::T(lex.table[k].lexema);
 		lenta_position = 0;
 		st.push(grebach.stbottomT);
 		st.push(grebach.startN);
@@ -54,69 +54,43 @@ namespace MFST
 
 	Mfst::RC_STEP Mfst::step()
 	{
-		RC_STEP rc = SURPRISE; // Инициализируем rc значением SURPRISE.
+		RC_STEP rc = SURPRISE;
 		if (lenta_position < lenta_size)
 		{
-			// Проверяем позицию, не достигли ли конца входной ленты.
 			if (GRB::Rule::Chain::isN(st.top()))
 			{
-				// Если вершина стека является нетерминалом 
-				GRB::Rule rule; // Создаем объект rule для хранения правила.
+				GRB::Rule rule;
 				if ((nrule = grebach.getRule(st.top(), rule)) >= 0)
 				{
-					// Получаем правило (getRule) из грамматики, используя вершину стека (st.top()).
-					// Если правило получено успешно (nrule >= 0).
-					GRB::Rule::Chain chain; // Создаем объект chain для хранения цепочки.
+					GRB::Rule::Chain chain;
 					if ((nrulechain = rule.getNextChain(lenta[lenta_position], chain, nrulechain + 1)) >= 0)
 					{
-						// Получаем следующую цепочку (getNextChain) из правила, связанного с текущей вершиной стека.
-						// Если цепочка получена успешно (nrulechain >= 0).
 						MFST_TRACE1
-						savestate(); // Сохраняем состояние.
-						st.pop(); // Удаляем вершину стека.
-						push_chain(chain); // Помещаем цепочку в стек.
-						rc = NS_OK; // Устанавливаем код успешного завершения (NS_OK).
+							savestate(); st.pop(); push_chain(chain); rc = NS_OK;
 						MFST_TRACE2
 					}
 					else
 					{
-						// Если цепочка не может быть получена.
 						MFST_TRACE4("TNS_NORULECHAIN/NS_NORULE")
-							savediagnosis(NS_NORULECHAIN); // Сохраняем диагноз NS_NORULECHAIN.
-						rc = resetstate() ? NS_NORULECHAIN : NS_NORULE; // Сбрасываем состояние и устанавливаем код ошибки NS_NORULECHAIN или NS_NORULE.
+							savediagnosis(NS_NORULECHAIN); rc = resetstate() ? NS_NORULECHAIN : NS_NORULE;
 					};
 				}
-				else
-				{
-					rc = NS_ERROR; // Если правило не может быть получено, устанавливаем код ошибки NS_ERROR.
-				}
+				else rc = NS_ERROR;
 			}
 			else if ((st.top() == lenta[lenta_position]))
 			{
-				// Если вершина стека соответствует текущему символу на входной ленте.
-				lenta_position++; // Перемещаем указатель на входной ленте на следующий символ.
-				st.pop(); // Удаляем вершину стека.
-				nrulechain = -1; // Сбрасываем индекс цепочки правила.
-				rc = TS_OK; // Устанавливаем код успешного завершения (TS_OK).
+				lenta_position++; st.pop(); nrulechain = -1; rc = TS_OK;
 				MFST_TRACE3
 			}
-			else
-			{
-				// Если не выполнены ни одно из предыдущих условий.то выводится диагноз
-				MFST_TRACE4(TS_NOK / NS_NORULECHAIN)
-					rc = resetstate() ? TS_NOK : NS_NORULECHAIN;
-				// Сбрасываем состояние и устанавливаем код ошибки TS_NOK или NS_NORULECHAIN.
-			}
+			else { MFST_TRACE4(TS_NOK / NS_NORULECHAIN) rc = resetstate() ? TS_NOK : NS_NORULECHAIN; };
 		}
 		else
 		{
-			rc = LENTA_END; // Если достигнут конец входной ленты, устанавливаем код LENTA_END.
-			MFST_TRACE4(LENTA_END)
+			rc = LENTA_END;
+			MFST_TRACE4(LENTA_END);
 		};
-		return rc; // Возвращаем код завершения разбора.
+		return rc;
 	};
-
-
 
 	bool Mfst::push_chain(GRB::Rule::Chain chain)
 	{
@@ -131,31 +105,23 @@ namespace MFST
 		return true;
 	};
 
-	bool Mfst::resetstate()//метод предназначен для сброса состояния парсера (разборщика
+	bool Mfst::resetstate()
 	{
-		bool rc = false; // Инициализация переменной rc значением false.
-		MfstState state; // Создание объекта MfstState с именем state.
+		bool rc = false;
+		MfstState state;
 		if (rc = (storestate.size() > 0))
 		{
-			// Проверяем, если в стеке storestate есть сохраненные состояния (storestate.size() > 0).
-			state = storestate.top(); // Извлекаем верхний элемент стека storestate и сохраняем его в объект state.
-			// Далее, следующие строки выполняют восстановление состояния парсера:
-			lenta_position = state.lenta_position; // Устанавливаем значение lenta_position на сохраненное состояние.
-			st = state.st; // Заменяем стек st на сохраненный стек из объекта state.
-			nrule = state.nrule; // Восстанавливаем значение nrule из объекта state.
-			nrulechain = state.nrulechain; // Восстанавливаем значение nrulechain из объекта state.
-
-			storestate.pop(); // Удаляем верхний элемент из стека storestate.
-
-			MFST_TRACE5("RESSTATE") // Пишем отладочное сообщение "RESSTATE".
-				MFST_TRACE2 // Дополнительное отладочное сообщение.
-
-				// После восстановления состояния, устанавливаем значение rc в true, чтобы указать, что состояние успешно восстановлено.
-				rc = true;
-		}
-		return rc; // Возвращаем значение rc, которое будет true, если состояние успешно восстановлено, и false в противном случае.
+			state = storestate.top();
+			lenta_position = state.lenta_position;
+			st = state.st;
+			nrule = state.nrule;
+			nrulechain = state.nrulechain;
+			storestate.pop();
+			MFST_TRACE5("RESSTATE")
+				MFST_TRACE2
+		};
+		return rc;
 	};
-
 
 	bool Mfst::savediagnosis(RC_STEP prc_step)
 	{
@@ -229,9 +195,12 @@ namespace MFST
 	}
 	char* Mfst::getCLenta(char* buf, short pos, short n)
 	{
-		short i, k = (pos + n < lenta_size) ? pos + n : lenta_size;
-		for (i = pos; i < k; i++) buf[i - pos] = GRB::Rule::Chain::alphabet_to_char(lenta[i]);
-		buf[i - pos] = 0x00;
+		short i = 0, k = (pos + n < lenta_size) ? pos + n : lenta_size;
+
+		for (int i = pos; i < k; i++)
+			buf[i - pos] = GRB::Rule::Chain::alphabet_to_char(lenta[i]);
+
+		
 		return buf;
 	}
 	char* Mfst::getDiagnosis(short n, char* buf)

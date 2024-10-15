@@ -1,36 +1,59 @@
-#include"Out.h"
+#include "stdafx.h"
+#include "Out.h"
+#pragma warning(disable:4996)
 
 namespace Out
 {
-	OUT GetOut(wchar_t outfile[])
+	OUT getout(wchar_t outfile[])
 	{
-		OUT temp;
-		temp.stream = new std::ofstream;
-		temp.stream->open(outfile);
-		if (!temp.stream->is_open())
-		{
-			ERROR_THROW(113);
-		}
-		wcscpy_s(temp.outfile, outfile);
-		return temp;
+		OUT out;
+		out.stream = new ofstream;
+		out.stream->open(outfile);
+		if (out.stream->fail())
+			throw ERROR_THROW(112);
+		wcscpy_s(out.outfile, outfile);
+		return out;
 	}
 
-	void WriteText(OUT out, In::IN in)
+	void WriteLine(OUT out, const char* c, ...)
 	{
-		*out.stream << in.text;
+		const char** ptr = &c;
+		int i = 0;
+		while (ptr[i] != "")
+			*out.stream << ptr[i++];
+		*out.stream << endl;
+	}
+	void WriteLine(OUT out, const wchar_t* c, ...)
+	{
+		const wchar_t** ptr = &c;
+		char temp[100];
+		int i = 0;
+		while (ptr[i] != L"")
+		{
+			wcstombs(temp, ptr[i++], sizeof(temp));
+			*out.stream << temp;
+		}
+		*out.stream << endl;
+	}
+
+	void WriteIn(OUT out, In::IN in)
+	{
+		*out.stream << in.text << std::endl;
 	}
 
 	void WriteError(OUT out, Error::ERROR error)
 	{
-		*out.stream << "Ошибка: " << error.id << ":" << error.message << std::endl;
-		if (error.inext.line != -1)
+		if (out.stream)
 		{
-			*out.stream << "Строка: " << error.inext.line << " Позиция: " << error.inext.col << std::endl;
+			*out.stream << "--- Ошибка!!! --- " << endl;
+			*out.stream << "Ошибка " << error.id << ": " << error.message << endl;
+			if (error.inext.line != -1)
+			{
+				*out.stream << "Строка: " << error.inext.line << endl << "Столбец: " << error.inext.col << endl << endl;
+			}
 		}
 	}
-
-	void Close(OUT out)
-	{
+	void Close(OUT out) {
 		out.stream->close();
 		delete out.stream;
 	}

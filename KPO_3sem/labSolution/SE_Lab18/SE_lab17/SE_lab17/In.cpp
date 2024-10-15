@@ -1,92 +1,65 @@
-#include"stdafx.h"
-#include"In.h"
-#include"Error.h"
-#include"Out.h"
-#include"Parm.h"
-#include"Log.h"
-#include <cstring>
-#include <cstdlib>
+#include "stdafx.h"
+#include "In.h"
+#include "Error.h"
+
+#define STRING_END_ZERO '\0'
+using namespace std;
 
 namespace In
 {
 	IN getin(wchar_t infile[])
 	{
-		IN in_result;
-		unsigned char symbol;
-		in_result.size = 0;
-		in_result.lines = 0;
-		bool failSpace = true;
-		std::ifstream file;
+		IN in;
+		in.size = 0;
+		in.lines = 1;
+		in.ignor = 0;
+		char* line = new char[IN_MAX_LEN_TEXT];;
+		int cols = 0;
 
-		file.open(infile);
-		if (!file.is_open())
-		{
+		unsigned char* text = new unsigned char[IN_MAX_LEN_TEXT];
+
+		ifstream fin(infile);
+		if (fin.fail())
 			throw ERROR_THROW(110);
-		}
-		in_result.text = new unsigned char[IN_MAX_LEN_TEXT];
-		char* tmp = new char[IN_MAX_LEN_TEXT];
 
-		while (file.getline(tmp, 1000))
+		while (in.size < IN_MAX_LEN_TEXT)
 		{
-			for (int position = 0; position < strlen(tmp); position++)
+			char k;
+			fin.get(k);
+			unsigned char uc = k;
+
+			if (fin.eof())
 			{
-				switch (in_result.code[int((unsigned char)tmp[position])])
-				{
-				case IN::T:
-					if (tmp[position] == 32 && position == 0)
-					{
-						while (tmp[position] == ' ')
-						{
-							position++;
-						}
-					}
-					if (tmp[position] == 32 && tmp[position + 1] == 32)
-					{
-						in_result.ignore++;
-						break;
-					}
-					if (tmp[position] == 32 && (tmp[position + 1] == '{' || tmp[position + 1] == '}' || tmp[position + 1] == '(' || tmp[position + 1] == ')' || tmp[position + 1] == ';' ||
-						tmp[position + 1] == '+' || tmp[position + 1] == '-' || tmp[position + 1] == '*' || tmp[position + 1] == '/' || tmp[position + 1] == '='))
-					{
-						in_result.ignore++;
-						break;
-					}
-					if (tmp[position] == 32 && (tmp[position - 1] == '{' || tmp[position - 1] == '}' || tmp[position - 1] == '(' || tmp[position - 1] == ')' || tmp[position - 1] == ';' ||
-						tmp[position - 1] == '+' || tmp[position - 1] == '-' || tmp[position - 1] == '*' || tmp[position - 1] == '/' || tmp[position - 1] == '=' || tmp[position - 1] == ','))
-					{
-						in_result.ignore++;
-						break;
-					}
-					if (position == strlen(tmp) - 1 && tmp[strlen(tmp) - 1] == 32)
-					{
-						in_result.ignore++;
-						break;
-					}
-					in_result.text[in_result.size] = (unsigned)tmp[position];
-					in_result.size++;
-					break;
-				case IN::F:
-					in_result.text[in_result.size] = '\0';
-					/*Out::WriteText(out, in_result);
-					Out::WriteError(out, ERROR_THROW_IN(111, in_result.lines, position+1));
-					Log::WriteError(log, ERROR_THROW_IN(111, in_result.lines, position+1));
-					Log::Close(log);
-					Out::Close(out);*/
-					throw ERROR_THROW_IN(111, in_result.lines, position + 1, in_result.text);
-					break;
-				case IN::I:
-					in_result.ignore++;
-					break;
-				default:
-					in_result.text[in_result.size] = in_result.code[tmp[position]];
-					in_result.size++;
-				}
+				text[in.size] = STRING_END_ZERO;
+				break;
 			}
-			in_result.lines++;
-			in_result.text[in_result.size] = '|';
-			in_result.size++;
+			if (in.code[uc] == in.T || in.code[uc] == in.D || in.code[uc] == in.O)
+			{
+				text[in.size] = uc;
+				in.size++;
+				cols++;
+			}
+			else if (in.code[uc] == in.I)
+			{
+				in.ignor++;
+			}
+			else if (in.code[uc] == in.F)
+			{
+				throw ERROR_THROW_IN(111, in.lines, cols);
+			}
+			else
+			{
+				text[in.size] = in.code[uc];
+				in.size++;
+				cols++;
+			}
+			if (uc == IN_CODE_ENDL)
+			{
+				in.lines++;
+				cols = 0;
+			}
 		}
-		in_result.text[in_result.size] = '\0';
-		return in_result;
+		in.text = text;
+		return in;
 	}
 }

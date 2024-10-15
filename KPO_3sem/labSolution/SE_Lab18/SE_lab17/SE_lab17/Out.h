@@ -1,8 +1,8 @@
 #pragma once
-#include<fstream>
-#include"In.h"
-#include"Parm.h"
-#include"Error.h"
+#include "stdafx.h"
+#include "In.h"
+#include "Error.h"
+#include "Parm.h"
 
 namespace Out
 {
@@ -11,10 +11,11 @@ namespace Out
 		wchar_t outfile[PARM_MAX_SIZE];
 		std::ofstream* stream;
 	};
-	static const OUT INITOUT{ L"", NULL };
-	OUT GetOut(wchar_t outfile[]);
-	void WriteText(OUT out, In::IN in);
+	static const OUT INITOUT = { L"", NULL };
+	OUT getout(wchar_t outfile[]);
+	void WriteLine(OUT out, const char* c, ...);
+	void WriteLine(OUT out, const wchar_t* c, ...);
+	void WriteIn(OUT out, In::IN in);
 	void WriteError(OUT out, Error::ERROR error);
-	void WriteLine(OUT out, char* c, ...);
 	void Close(OUT out);
 }

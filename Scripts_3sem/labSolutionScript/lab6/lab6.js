@@ -4,9 +4,9 @@ let numbers = [1, 2, 3, 4]
 
 let first
 
-[first] = numbers
+[first, sec] = numbers
 
-console.log(first)
+console.log(first, sec)
 
 /*2.Объект user имеет свойства name, age. Создайте объект admin, у которого есть свойства admin и все свойства объекта user. Используйте spread оператор.*/
 

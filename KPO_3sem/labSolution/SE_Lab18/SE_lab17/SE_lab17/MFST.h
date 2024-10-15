@@ -1,14 +1,12 @@
 #pragma once
 #include "stdafx.h"
-#include<iomanip>
-
 
 class my_stack_SHORT :public std::stack<short> {
 public:
 	using std::stack<short>::c; // стек автомата
 };
 
-#define MFST_DIAGN_MAXSIZE 2* ERROR_MAXSIZE_MESSAGE
+#define MFST_DIAGN_MAXSIZE 2*ERROR_MAXSIZE_MESSAGE
 #define MFST_DIAGN_NUMBER 3
 
 static int FST_TRACE_n = -1;
@@ -124,6 +122,7 @@ namespace MFST
 				nrulechains = 0;
 			};
 		}deducation;
+
 		bool savededucation();
 	};
 }

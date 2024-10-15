@@ -1,5 +1,5 @@
 #pragma once
-#include<tchar.h>
+#include <tchar.h>
 #define PARM_IN L"-in:"
 #define PARM_OUT L"-out:"
 #define PARM_LOG L"-log:"
@@ -15,5 +15,6 @@ namespace Parm
 		wchar_t out[PARM_MAX_SIZE];
 		wchar_t log[PARM_MAX_SIZE];
 	};
-	PARM getparm(int argc, wchar_t* argv[]);
-};
+
+	PARM getparm(int argc, _TCHAR* argv[]);
+}

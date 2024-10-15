@@ -1,48 +1,65 @@
 #include "stdafx.h"
-
+#include <fstream>
 namespace LT
 {
-    // —оздать таблицу лексем заданного размера
-    LexTable Create(int size)
-    {
-        LexTable* tabl = new LexTable;
+	LT::LexTable::LexTable()
+	{
+		this->maxsize = LT_MAXSIZE;
+		this->size = 0;
+		this->table = new Entry[LT_MAXSIZE];
+	}
 
-        // ѕроверить, не превышено ли максимальное количество лексем в таблице
-        if (size > LT_MAXSIZE)
-        {
-            throw ERROR_THROW(2); // ¬ызвать ошибку с кодом 2, если превышено максимальное количество лексем (> 4096)
-        }
+	void Add(LexTable& lextable, Entry entry)
+	{
+		if (lextable.size < lextable.maxsize)
+			lextable.table[lextable.size++] = entry;
+		else
+			throw ERROR_THROW(120);
+	}
+	Entry LexTable::GetEntry(int n)
+	{
+		if (n < this->maxsize && n >= 0)
+			return this->table[n];
+	}
+	void Delete(LexTable& lextable)
+	{
+		delete[] lextable.table;
+		lextable.table = nullptr;
+	}
+	void LexTable::PrintLexTable(const wchar_t* in)
+	{
+		cout << "--------- “аблица лексем ---------";
 
-        tabl->maxsize = size; // ”становить максимальный размер таблицы
-        tabl->size = 0; // ”становить текущий размер таблицы
-        tabl->table = new Entry[size]; // —оздать новую запись в таблице
+			int num_string = 0;
+			for (int i = 0; i < this->size;)
+			{
+				if (num_string == this->table[i].sn)
+					cout << this->table[i++].lexema;//
+				else
+				{
+					num_string++;
+					if (this->table[i].sn != num_string)
+					{
+						continue;
+					}
+					cout << '\n' << num_string << ".\t";
 
-        return *tabl; // ¬ернуть созданную таблицу
-    }
+					if (num_string == this->table[i].sn)
+						cout << this->table[i++].lexema;
+				}
+			}
+		}
+	LT::Entry::Entry()
+	{
+		this->lexema = '\0';
+		this->sn = LT_TI_NULLXDX;
+		this->idxTI = LT_TI_NULLXDX;
+	}
 
-    // ƒобавить запись в таблицу лексем
-    void Add(LexTable& lextable, Entry entry)
-    {
-        // ѕроверить, не превышено ли максимальное количество лексем в таблице
-        if (lextable.size + 1 > lextable.maxsize)
-        {
-            throw ERROR_THROW(114); // ¬ызвать ошибку с кодом 114, если превышено максимальное количество лексем в таблице
-        }
-
-        lextable.table[lextable.size] = entry; // ƒобавить запись в таблицу
-        lextable.size += 1; // ”величить текущий размер таблицы
-    }
-
-    // ѕолучить запись из таблицы лексем по индексу
-    Entry GetEntry(LexTable& lextable, int n)
-    {
-        return lextable.table[n]; // ¬ернуть запись по указанному индексу
-    }
-
-    // ”далить таблицу лексем
-    void Delete(LexTable& lextable)
-    {
-        delete[] lextable.table; // ќсвободить пам€ть, занимаемую таблицей
-        //delete &lextable; // ¬озможно, эту строку можно удалить, так как она закомментирована и не выполн€ет никаких действий
-    }
-};
+	LT::Entry::Entry(const char lex, int str_n, int idxTI)
+	{
+		this->lexema = lex;
+		this->sn = str_n;
+		this->idxTI = idxTI;
+	}
+}

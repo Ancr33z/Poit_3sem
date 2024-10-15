@@ -1,8 +1,5 @@
 #pragma once
-#include<fstream>
-#include"In.h"
-#include"Parm.h"
-#include"Error.h"
+#include "stdafx.h"
 
 namespace Log
 {
@@ -11,10 +8,10 @@ namespace Log
 		wchar_t logfile[PARM_MAX_SIZE];
 		std::ofstream* stream;
 	};
-	static const LOG INITLOG{ L"", NULL };
+	static const LOG INITLOG = { L"", NULL };
 	LOG getlog(wchar_t logfile[]);
-	void WriteLine(LOG log, char* c, ...);
-	void WriteLine(LOG log, wchar_t* c, ...);
+	void WriteLine(LOG log, const char* c, ...);
+	void WriteLine(LOG log, const wchar_t* c, ...);
 	void WriteLog(LOG log);
 	void WriteParm(LOG log, Parm::PARM parm);
 	void WriteIn(LOG log, In::IN in);

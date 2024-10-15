@@ -1,6 +1,5 @@
 #pragma once
-#include<iostream>
-#include<cstdlib>
+#include "stdafx.h"
 
 namespace FST
 {
@@ -8,15 +7,12 @@ namespace FST
 	{
 		char symbol;
 		short nnode;
-		RELATION(
-			char c = 0x00,
-			short ns = 0
-		);
+		RELATION(char c = 0x00, short ns = NULL);
 	};
 
 	struct NODE
 	{
-		short n_relations;
+		short n_relation; //количество инцидентных ребер
 		RELATION* relations;
 		NODE();
 		NODE(short n, RELATION rel, ...);
@@ -24,14 +20,13 @@ namespace FST
 
 	struct FST
 	{
-		char* string;
+		const  char* string;
 		short position;
-		short nstates;
+		short nstates; //количество состояний автомата
 		NODE* nodes;
 		short* rstates;
-		FST(char* s, short ns, NODE n, ...);
+		FST(const  char* s, short ns, NODE n, ...);
 	};
 
-	bool Execute(FST& fst);
-	bool step(FST& fst, short*& rstates);
-}
+	bool execute(FST& fst);
+};

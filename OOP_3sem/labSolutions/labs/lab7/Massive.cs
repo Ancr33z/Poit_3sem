@@ -84,6 +84,18 @@ namespace lab7
 
         }
 
+        public T Find(Predicate<T> match)
+        {
+            for (int i = 0; i < _count; i++)
+            {
+                if (match(_array[i]))
+                {
+                    return _array[i];
+                }
+            }
+            return default; // Возвращает значение по умолчанию, если элемент не найден
+        }
+
         // Перегрузка вычитания со скалярным значением
         public static OneDimensionalArray<T> operator -(OneDimensionalArray<T> array, int scalar) 
         {

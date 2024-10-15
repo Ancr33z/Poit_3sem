@@ -2,11 +2,7 @@
 #include "Error.h"
 
 
-typedef short GRBALPHABET;
-#define GRB_ERROR_SERIES 600
-#define NS(n) GRB::Rule::Chain::N(n)
-#define TS(n) GRB::Rule::Chain::T(n)
-#define ISNS(n)	GRB::Rule::Chain::isN(n)
+typedef short GRBALPHABET; //символы алфавита грамматики терминалы > 0,  нетерминалы < 0
 namespace GRB
 {
 	struct Rule							//правило в грамматике Грейбах
