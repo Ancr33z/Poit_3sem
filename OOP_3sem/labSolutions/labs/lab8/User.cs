@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 
 namespace Lab8
 {
@@ -8,28 +8,40 @@ namespace Lab8
 
     public delegate void Move(int extent);
     public delegate void Squeeze(double compressionRate);
-    class User
+    public class User
     {
-        public static event Move OnMove;
-        public static event Squeeze OnSqueez;
+        public event Action<int> Move; // смещение
+        public event Action<double> Resize; // коэффициент сжатия
 
-        public static void MoveUser(Software soft)
+        public string Name { get; set; }
+        public int Position { get; private set; } = 0;
+        public double Size { get; private set; } = 1.0;
+
+        public User(string name)
         {
-            Console.WriteLine($"Пользователь перемещен на {}px");
-            User.OnSqueez += soft.Move;
-            ;
+            Name = name;
         }
-        public static void EndWorkWithSoft(Software soft)
+
+        public void OnMove(int offset)
         {
-            Console.WriteLine("Завершаю работу...");
-            User.EndWork += soft.EndWork;
-            EndWork?.Invoke();
+            this.Position += offset;
+            Move?.Invoke(offset);
         }
-        public static void UpgradeVersion(Software soft, string newVersion)
+
+        public void OnResize(double factor)
         {
-            Console.WriteLine("Обновление...");
-            User.OnUpgrade += soft.ChangeVersion;
-            OnUpgrade?.Invoke(newVersion);
+            this.Size *= factor;
+            Resize?.Invoke(factor);
+        }
+
+        public void SubscribeToMove(Action<int> moveHandler)
+        {
+            Move += moveHandler;
+        }
+
+        public void SubscribeToResize(Action<double> resizeHandler)
+        {
+            Resize += resizeHandler;
         }
     }
 }

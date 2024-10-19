@@ -57,6 +57,12 @@ namespace lab7
             intArr.AddItem(30);
             intArr.AddItem(40);
             intArr.Show();
+
+            Predicate<int> isEven = n => n % 2 == 0;
+
+            int result = intArr.Find(isEven);
+            Console.WriteLine($"Первое четное число: {result}");
+
             Console.WriteLine("\n---------------Массив типа Bars---------------\n");
 
             OneDimensionalArray<Circle> circleArr = new OneDimensionalArray<Circle>();

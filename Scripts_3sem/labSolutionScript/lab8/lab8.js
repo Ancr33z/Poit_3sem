@@ -32,6 +32,7 @@ let copyUser1 = {
 console.log("Мой пример номер(3))")
 copyUser1.location.city = 'Pinsk';// Изменяем город в копии
 console.log(copyUser1);
+console.log(user1);
 
 
 //4)
@@ -221,6 +222,7 @@ copyUser5.studies.exams[1].mark = 10;
 
 console.log("ВТОРОЕ ЗАДАНИЕ");
 console.log(copyUser5);
+console.log(user5);
 
 
 
@@ -269,6 +271,7 @@ let copyUser6 = {
 console.log("ТРЕТЬЕ ЗАДАНИЕ")
 copyUser6.studies.exams[0].professor.name = "Beloded Nikolay";
 console.log(copyUser6);
+console.log(user6);
 
 
 
