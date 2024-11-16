@@ -52,7 +52,7 @@ void printTree(Node* root, string indent = "", bool isRight = true) {
     }
 }
 
-void buildHuffmanTree(string text) {
+void buildHuffmanTree(string text, Node*& root, unordered_map<string, string>& huffmanCode) {
     unordered_map<string, int> freq;
 
     for (char ch : text) {
@@ -67,7 +67,6 @@ void buildHuffmanTree(string text) {
         nodes.push_back(getNode(pair.first, pair.second, nullptr, nullptr, index++));
     }
 
-    // Sort nodes by frequency in descending order
     sort(nodes.begin(), nodes.end(), [](Node* l, Node* r) {
         return l->freq > r->freq;
         });
@@ -86,11 +85,10 @@ void buildHuffmanTree(string text) {
             });
     }
 
-    Node* root = nodes.front();
+    root = nodes.front();
     cout << "\nДерево Хаффмана:\n";
     printTree(root);
 
-    unordered_map<string, string> huffmanCode;
     encode(root, "", huffmanCode);
 
     cout << "\nКоды Хаффмана:\n";
@@ -99,16 +97,53 @@ void buildHuffmanTree(string text) {
     }
 }
 
+string encodeString(const string& text, const unordered_map<string, string>& huffmanCode) {
+    string encodedStr;
+    for (char ch : text) {
+        encodedStr += huffmanCode.at(string(1, ch));
+    }
+    return encodedStr;
+}
+
+string decodeString(Node* root, const string& encodedStr) {
+    string decodedStr;
+    Node* currentNode = root;
+
+    for (char bit : encodedStr) {
+        if (bit == '0') {
+            currentNode = currentNode->left;
+        }
+        else {
+            currentNode = currentNode->right;
+        }
+
+        // Если достигли листа, добавляем символ к результату
+        if (!currentNode->left && !currentNode->right) {
+            decodedStr += currentNode->ch;
+            currentNode = root;  // возвращаемся к корню для следующего символа
+        }
+    }
+    return decodedStr;
+}
+
 int main() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-
+     
     string text;
     cout << "Введите текст для кодирования: ";
     getline(cin, text);
 
-    cout << "Построение дерева для текста: \"" << text << "\"\n";
-    buildHuffmanTree(text);
+    Node* root = nullptr;
+    unordered_map<string, string> huffmanCode;
+    buildHuffmanTree(text, root, huffmanCode);
+
+    string encodedStr = encodeString(text, huffmanCode);
+    cout << "\nЗакодированная строка: " << encodedStr << endl;
+
+    string decodedStr = decodeString(root, encodedStr);
+    cout << "\nДекодированная строка: " << decodedStr << endl;
 
     return 0;
 }
+ 

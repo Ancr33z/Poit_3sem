@@ -1,0 +1,62 @@
+/* Стили для основного контейнера судоку */
+.sudoku_container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px auto;
+    width: max-content;
+    border: 3px solid black;
+    /* Внешняя толстая рамка */
+}
+
+/* Стили для каждой строки квадратов */
+.sudoku_row {
+    display: flex;
+}
+
+/* Стили для каждого 3x3 квадрата */
+.square {
+    display: flex;
+    flex-wrap: wrap;
+    width: 122px;
+    /* 40px * 3 */
+    height: 122px;
+    border: 2px solid black;
+    /* Границы квадратов */
+    box-sizing: border-box;
+}
+
+/* Стили для каждого поля ввода */
+.field {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    text-align: center;
+    border: 1px solid #ccc;
+    /* Границы ячеек */
+    margin: -1px 0 0 -1px;
+    /* Убираем двойные границы */
+    box-sizing: border-box;
+}
+
+/* Убираем верхнюю и левую границы у первых ячеек */
+.square .field:nth-child(3n+1) {
+    margin-left: 0;
+}
+
+.square .field:nth-child(-n+3) {
+    margin-top: 0;
+}
+
+/* Стили для контейнера кнопок */
+.button_container {
+    margin: 20px auto;
+    text-align: center;
+}
+
+/* Стили для кнопок */
+.button_container button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}

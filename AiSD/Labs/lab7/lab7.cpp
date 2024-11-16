@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿
+#include <iostream>
 #include <string>
 #include <cctype>
 
@@ -43,7 +44,12 @@ void findLIS(int sequence[], int n) {
 
     // Основной цикл: вычисляем длины всех подпоследовательностей
     for (int i = 1; i < n; i++) {
+        //if (i == 1) continue;
+        //if (i == 7) continue;
         for (int j = 0; j < i; j++) {
+            //if (i == 1) continue;
+            //if (i == 7) continue;
+
             // Добавим проверку для выбора наименьших элементов при одинаковой длине
             if (sequence[i] > sequence[j] && dp[i] < dp[j] + 1) {
                 dp[i] = dp[j] + 1;
@@ -53,12 +59,13 @@ void findLIS(int sequence[], int n) {
         // Обновляем максимальную длину подпоследовательности
         if (dp[i] > maxLength) {
             maxLength = dp[i];
-            lastIndex = i;
+            lastIndex = i;  
         }
     }
 
     // Ищем последовательность с минимальными элементами среди равных по длине
     for (int i = 0; i < n; i++) {
+
         if (dp[i] == maxLength && sequence[i] < sequence[lastIndex]) {
             lastIndex = i;
         }
@@ -71,6 +78,8 @@ void findLIS(int sequence[], int n) {
     int lis[100];  // Массив для хранения подпоследовательности
     int k = 0;
     while (lastIndex != -1) {
+        if (lastIndex == 1 ) continue;
+
         lis[k++] = sequence[lastIndex];
         lastIndex = previous[lastIndex];
     }
@@ -120,4 +129,3 @@ int main() {
 
     return 0;
 }
-

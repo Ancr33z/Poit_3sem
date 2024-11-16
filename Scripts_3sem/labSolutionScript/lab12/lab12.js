@@ -1,260 +1,137 @@
-//1.Создайте объект person с методами greet (сообщение с приветствием пользователя) и ageAfterYears (принимает years и возвращает “текущий возраст” + years), которые используют this для доступа к свойствам объекта.
-
-let person = {
-
-    name: "Jhone",
-
-    age: 20,
-
-    ageAfterYears(age) {
-        return this.age + age
-    },
-
-    greet() {
-        console.log("Привет!")
+class Sudoku {
+    constructor() {
+        this.initialBoard = Array.from({ length: 9 }, () => Array(9).fill(0));
+        this.board = this.cloneBoard(this.initialBoard);
     }
-}
 
-person.greet()
-
-console.log(person.ageAfterYears(10))
-
-//2. Создайте объект car, который имеет свойства model и year, а также метод getInfo, который выводит информацию о машине.
-
-let car = {
-    model: "Honda Civic",
-    year: 2021,
-    getInfo() {
-        console.log(`Модель машины: ${this.model}, год выпуска: ${this.year}`)
+    // Клонируем игровое поле
+    cloneBoard(board) {
+        return board.map(row => [...row]);
     }
-}
 
-car.getInfo()
-
-//3. Создайте функцию-конструктор Book, которая создает объекты с методами getTitle и getAuthor.
-
-function Book(title) {
-    this.title = title;
-    this.author = "someOne";
-    this.getTitle = function () {
-        console.log(this.title)
+    // Метод для вывода игрового поля в консоль
+    printBoard() {
+        this.board.forEach(row => console.log(row.join("  ")));
     }
-    this.getAuthor = function () {
-        console.log(this.author)
+
+    // Метод для сброса игрового поля до исходного состояния
+    resetBoard() {
+        this.board = this.cloneBoard(this.initialBoard);
     }
-}
-let newBook = new Book("Piece and War")
 
-newBook.getTitle()
-newBook.getAuthor()
-
-
-
-//4. Создайте объект team, который содержит массив игроков и метод для вывода информации о каждом игроке. Используйте this в вложенной функции.
-
-let team = {
-    players: ["firstPlayer", "secondPlayer", "thirdPlayer"],
-    showInfo() {
-        for (pers of this.players) {
-            console.log(pers)
-        }
-    }
-}
-
-team.showInfo()
-
-
-//5. Создайте модуль counter, который инкапсулирует переменную count и предоставляет методы для инкрементации, декрементации и получения текущего значения. Используйте this для доступа к свойствам.
-
-const counter = (function () {
-    let count = 0;
-
-
-    return {
-        increment() {
-            count++;
-            return count;
-        },
-        decrement() {
-            count--;
-            return count;
-        },
-        getCount() {
-            return count;
-        }
-    };
-})();
-
-console.log(counter.increment());
-console.log(counter.increment());
-console.log(counter.decrement());
-console.log(counter.getCount());
-
-//6. Создайте объект item со свойством price. Сначала определите его с параметрами, разрешающими изменение и удаление. Затем переопределите дескрипторы так, чтобы свойство стало неизменяемым.
-
-let item = {
-    price: 15,
-    name: "someItem"
-}
-
-console.log(item.price)
-
-Object.defineProperty(item, "price", {
-    value: 20,
-    writable: false,
-});
-
-let descriptor = Object.getOwnPropertyDescriptor(item, 'price');
-
-console.log(JSON.stringify(descriptor, null, 2));
-
-console.log(item)
-item.price = 2
-console.log(item)
-
-
-//7. Создайте объект circle, который имеет свойство radius. Добавьте геттер для вычисления площади круга на основе радиуса, геттер и сеттер для изменения радиуса.
-
-const createCircle = (initialRadius = 1) => {
-    let _radius = initialRadius;
-
-    return {
-        get radius() {
-            return _radius;
-        },
-
-        set radius(newRadius) {
-            if (newRadius > 0) {
-                _radius = newRadius;
-            } else {
-                console.log("Радиус должен быть положительным числом.");
+    // Метод для проверки строки на наличие дубликатов
+    checkRow(row) {
+        const seen = new Set();
+        for (let col = 0; col < 9; col++) {
+            const num = this.board[row][col];
+            if (num !== 0) {
+                if (seen.has(num)) {
+                    console.log(`Ошибка в строке ${row + 1}`);
+                    return false;
+                }
+                seen.add(num);
             }
-        },
-
-        get area() {
-            return Math.PI * _radius ** 2;
         }
-    };
-};
+        return true;
+    }
 
-const circle = createCircle();
-
-console.log(circle.radius);
-console.log(circle.area);
-
-circle.radius = 5;
-console.log(circle.radius);
-console.log(circle.area);
-
-circle.radius = -3;
-
-
-//8. Создайте объект car с тремя свойствами: make, model, и year. Сначала определите их с параметрами, разрешающими изменение и удаление. Затем переопределите дескрипторы, чтобы все свойства стали неизменяемыми.
-
-let car2 = {
-    make: "делает",
-    model: "BMW m5",
-    year: 2015,
-}
-
-Object.defineProperty(car2, "make", {
-    configurable: false
-});
-Object.defineProperty(car2, "model", {
-    configurable: false
-});
-Object.defineProperty(car2, "year", {
-    configurable: false
-});
-
-
-//9. Создайте массив, в котором будет три числа. Используя Object.defineProperty, добавьте свойство sum (геттер), которое будет возвращать сумму всех элементов массива. Сделайте это свойство доступным только для чтения.
-
-
-let massive = [2, 3, 4]
-
-Object.defineProperty(massive, "sum", {
-    get() {
-        return this.reduce((acc, num) => acc + num, 0);
-    },
-    enumerable: true,   // делает свойство перечисляемым
-    configurable: false // делает свойство неизменяемым
-});
-
-console.log(massive.sum)
-
-
-//10. Создайте объект rectangle, который имеет свойства width и height. Добавьте геттер для вычисления площади прямоугольника, геттеры и сеттеры для ширины и высоты.
-
-const rectangle = (width = 10, height = 10) => {
-    let _width = width;
-    let _height = height;
-
-    return {
-
-        get width() {
-            return _width;
-        },
-
-        set width(newWidth) {
-            if (newWidth > 0) {
-                _width = newWidth;
-            } else {
-                console.log("Ширина должна быть положительным числом.");
+    // Метод для проверки столбца на наличие дубликатов
+    checkColumn(col) {
+        const seen = new Set();
+        for (let row = 0; row < 9; row++) {
+            const num = this.board[row][col];
+            if (num !== 0) {
+                if (seen.has(num)) {
+                    console.log(`Ошибка в столбце ${col + 1}`);
+                    return false;
+                }
+                seen.add(num);
             }
-        },
-
-        get height() {
-            return _height;
-        },
-
-        set height(newHeight) {
-            if (newHeight > 0) {
-                _height = newHeight;
-            } else {
-                console.log("Высота должна быть положительным числом.");
-            }
-        },
-
-        get area() {
-            return _width * _height;
         }
-    };
-};
+        return true;
+    }
 
-const rectangle1 = rectangle();
+    // Метод для проверки квадрата 3x3 на наличие дубликатов
+    checkSquare(row, col) {
+        const seen = new Set();
+        const startRow = row - (row % 3);
+        const startCol = col - (col % 3);
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const num = this.board[startRow + i][startCol + j];
+                if (num !== 0) {
+                    if (seen.has(num)) {
+                        console.log(`Ошибка в квадрате (${startRow + 1}, ${startCol + 1})`);
+                        return false;
+                    }
+                    seen.add(num);
+                }
+            }
+        }
+        return true;
+    }
 
-console.log(rectangle1.area);
-rectangle1.height = 20;
+    // Метод для проверки всего игрового поля на наличие ошибок
+    checkBoard() {
+        let valid = true;
+        for (let i = 0; i < 9; i++) {
+            if (!this.checkRow(i)) valid = false;
+            if (!this.checkColumn(i)) valid = false;
+        }
+        for (let row = 0; row < 9; row += 3) {
+            for (let col = 0; col < 9; col += 3) {
+                if (!this.checkSquare(row, col)) valid = false;
+            }
+        }
+        return valid;
+    }
 
-console.log(rectangle1.area);
+    // Метод для генерации правильного игрового поля (заполняет поле корректно)
+    generateSolution() {
+        const fillBoard = (row, col) => {
+            if (col === 9) {
+                col = 0;
+                row++;
+                if (row === 9) return true;
+            }
 
-//11. Создайте объект user, который имеет свойства firstName и lastName. Добавьте геттер для получения полного имени и сеттер для изменения полного имени.
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
 
-const user = {
-    firstName: "Nikita",
-    lastName: "Borisov",
-    get fullName() {
-        return `Полное имя: ${this.lastName} ${this.firstName}`;
-    },
-    set fullName(value) {
-        [this.lastName, this.firstName] = value.split(" ");
+            for (const num of numbers) {
+                if (this.isValidPlacement(row, col, num)) {
+                    this.board[row][col] = num;
+                    if (fillBoard(row, col + 1)) return true;
+                    this.board[row][col] = 0;
+                }
+            }
+
+            return false;
+        };
+
+        this.resetBoard();
+        fillBoard(0, 0);
+    }
+
+    // Метод для проверки, может ли число быть поставлено на определенную позицию
+    isValidPlacement(row, col, num) {
+        for (let i = 0; i < 9; i++) {
+            if (this.board[row][i] === num || this.board[i][col] === num) return false;
+        }
+
+        const startRow = row - (row % 3);
+        const startCol = col - (col % 3);
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (this.board[startRow + i][startCol + j] === num) return false;
+            }
+        }
+
+        return true;
     }
 }
 
-console.log(user.fullName); // Полное имя: Borisov Nikita
-
-user.fullName = "Cooper Alice";
-
-console.log(user.firstName); // Alice
-console.log(user.lastName);  // Cooper
-console.log(user.fullName);  // Полное имя: Cooper Alice
-
-
-// Опа попа нашла посхалллллкууууу
-// а я тут могу сказать что например вот ЛЮБЛЮ ТЕБЯ очень очень сильно ❤️❤️❤️❤️ И не хочу терять, постораюсь радовать тебя каждый день
-// но если будут проблемы то мы справимся вместе вот и всё (ты самая лучшая девушка в мире)
-// а ещё ты очень красивая, очень аккуратная такая блин вообще капэц
-// ну а потом вдобавок ещё и заботливая капеееец
-// и попочка классная хи-хи-хи
-//(ты меня полностью устраиваешь)
+// Пример использования класса
+const sudoku = new Sudoku();
+sudoku.generateSolution();
+sudoku.printBoard();
+sudoku.checkBoard();

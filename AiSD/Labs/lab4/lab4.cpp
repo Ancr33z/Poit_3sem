@@ -41,7 +41,7 @@ void main()
 				{
 					D[i][j] = Sum;
 					S[i][j] = k + 1;
-				}
+				}	
 			}
 		}
 	}

@@ -88,10 +88,6 @@ console.log(simpleTriangle.getInfo());
 console.log(complexTriangle.getInfo());
 
 
-//С помощью методов JS получите свойства, которые отличают фигуру «зеленый круг»; свойства, которые описывают фигуру «треугольник с тремя линиями»; есть ли у фигуры «маленький квадрат» собственное свойство, которое определяет цвет фигуры.
-
-
-
 //2.Реализуйте иерархию классов:
 
 // Human: содержит поля Имя, Фамилия, Возраст, Адрес.Методы, позволяющие изменить значения для возраста и адреса.
@@ -165,6 +161,7 @@ class Human2 {
 
 }
 
+
 let me2 = new Human2("Nikita")
 console.log(me2._name)
 me2.changeName("sss")
@@ -183,6 +180,10 @@ class Student extends Human2 {
     _group = 9
     _numberZachetki = 71232769
 
+    constructor(name, numberZachetki) {
+        super(name);
+        this._numberZachetki = numberZachetki
+    }
 
     changeKyrsGroup(kyrs, group) {
         if (kyrs > 0 && group > 0) {
@@ -200,7 +201,8 @@ class Student extends Human2 {
 
 }
 
-let student = new Student("nik")
+let student = new Student("nik", "7031235");
+
 student.getFullName()
 console.log(student._kyrs)
 console.log(student._group)
@@ -212,21 +214,19 @@ console.log(student._group)
 
 
 class Faculty {
-    constructor(facultyName, groupCount, studentCount) {
+    constructor(facultyName, groupCount) {
         this.facultyName = facultyName;
         this.groupCount = groupCount;
-        this.studentCount = studentCount;
-        this.studentRecords = []; // Список номеров зачеток студентов
+        this.students = [];
+    }
+
+    addStudent(student) {
+        this.students.push(student)
     }
 
     // Метод для изменения количества групп
     setGroupCount(newGroupCount) {
         this.groupCount = newGroupCount;
-    }
-
-    // Метод для изменения количества студентов
-    setStudentCount(newStudentCount) {
-        this.studentCount = newStudentCount;
     }
 
     // Метод добавления номера зачетки студента
@@ -236,28 +236,27 @@ class Faculty {
 
     // Метод, который возвращает количество студентов специальности ДЭВИ (шифр специальности 3)
     getDev() {
-        const devStudents = this.studentRecords.filter(record => record.charAt(1) === '3');
+        const devStudents = this.students.filter(record => record._numberZachetki[1] == '3');
         return devStudents.length;
     }
 
     // Метод, который возвращает список студентов заданной группы
     getGroupe(groupNumber) {
         // Предполагаем, что номер группы находится в номере зачетки, замените  на нужную логику
-        const groupStudents = this.studentRecords.filter(record => record.slice(2, 4) === groupNumber);
+        const groupStudents = this.students.filter(record => record._group == groupNumber);
         return groupStudents;
     }
 }
 
 // Пример использования
-const fitFaculty = new Faculty("ФИТ", 10, 200);
+const fitFaculty = new Faculty("ФИТ", 10);
 
-// Добавляем студентов
-fitFaculty.addStudentRecord("71201300");
-fitFaculty.addStudentRecord("73201301");
-fitFaculty.addStudentRecord("71203302");
+let student2 = new Student("Vik", "7330234");
+fitFaculty.addStudent(student)
+fitFaculty.addStudent(student2)
 
 // Получаем количество студентов ДЭВИ
 console.log("Количество студентов специальности ДЭВИ:", fitFaculty.getDev());
 
 // Получаем список студентов заданной группы
-console.log("Список студентов группы 20:", fitFaculty.getGroupe("20"));
+console.log("Список студентов группы 9:", fitFaculty.getGroupe("9"));

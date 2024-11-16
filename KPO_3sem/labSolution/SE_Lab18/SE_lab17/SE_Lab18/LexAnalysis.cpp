@@ -5,6 +5,7 @@ namespace LA
 	void FindLex(const In::IN& source, LT::LexTable& lexTable, IT::IdTable& idTable)
 	{
 		char* temp = new char[token_size] {};
+
 		int str_number = 1;
 		int str_position = 1;
 		In::IN in;
