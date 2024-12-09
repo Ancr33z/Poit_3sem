@@ -5,7 +5,7 @@
 
 
 #define BEGIN ".586\n"\
-".model flat, stdcall\n"\
+".model flat , stdcall\n"\
 "includelib libucrt.lib\n"\
 "includelib kernel32.lib\n"\
 "includelib ..\\Debug\\FuncLib.lib\n"\

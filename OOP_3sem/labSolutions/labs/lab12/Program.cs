@@ -1,23 +1,32 @@
-﻿using System; // Подключение пространства имен для базовых функций C#
+﻿using System;
 using static System.Net.Mime.MediaTypeNames; // Подключение пространства имен для работы с типами мультимедиа
 using System.IO; // Подключение пространства имен для работы с файлами и директориями
-using System.Text; // Подключение пространства имен для работы с текстом и кодировками
-using System.Reflection; // Подключение пространства имен для работы с отражением
-using System.Collections.Specialized; // Подключение пространства имен для работы с коллекциями
+using System.Text;
+using System.Reflection;
+using System.Collections.Specialized;
 using System.IO.Compression; // Подключение пространства имен для работы с архивами
-using System.Data.SqlTypes; // Подключение пространства имен для работы с SQL типами данных
+using System.Data.SqlTypes;
+using System.Reflection.Metadata;
 
-namespace Lab12 // Объявление пространства имен Lab12
+namespace Lab12
 {
-    // Статический класс для ведения логов
-    public static class BNALog
+    /*.1) Создать класс XXXLog. Он должен отвечать за работу с текстовым файлом
+    xxxlogfile.txt. в который записываются все действия пользователя и
+    соответственно методами записи в текстовый файл, чтения, поиска нужной
+    информации.
+    a. Используя данный класс выполните запись всех
+    последующих действиях пользователя с указанием действия,
+    детальной информации (имя файла, путь) и времени
+    (дата/время)
+*/
+    public static class KVVLog//1)Класс XXXLog для работы с текстовым файлом xxxlogfile.txt
     {
-        static string logfile = "BNAlogfile.txt"; // Имя файла лога
+        static string logfile = "BNAlogfile.txt";
 
         // Метод для записи информации в лог
         public static void Write(string method, string filename = null)
         {
-            string textFromLogFile = Read(); // Чтение текущего содержимого файла лога
+            string textFromLogFile = Read(); // 1)Чтение текущего содержимого файла лога
             textFromLogFile += $"Date - {DateTime.Now}" + (filename != null ? $"\nFile - {filename} \n" : "\n")
                 + $"Method - {method}\n"; // Форматирование записи с датой, именем метода и файла, если задан
 
@@ -41,22 +50,90 @@ namespace Lab12 // Объявление пространства имен Lab12
         public static bool Find(string str)
         {
             string text = Read(); // Чтение содержимого лога
-            if (text.IndexOf(str) != -1) // Поиск строки в содержимом лога
+            if (text.IndexOf(str) != -1) // 1)Поиск строки в содержимом лога
             {
                 return true; // Возвращает true, если строка найдена
             }
             return false; // Возвращает false, если строка не найдена
         }
+        public static void FilterAndSaveLastHourEntries(string filePath)//6)отсавляет послежние записи за час
+        {
+            // Проверяем существование файла
+            if (!File.Exists(filePath))//Exists: Проверяет, существует ли указанная директория
+            {
+                Console.WriteLine("Файл не найден.");
+                return;
+            }
+
+            // Читаем все строки из файла
+            string[] logEntries = File.ReadAllLines(filePath);
+
+            // Получаем текущую дату и время
+            DateTime currentDateTime = DateTime.Now;//получветс=т текущее время 
+
+            // Хранилище для записей за последний час
+            var lastHourEntries = new System.Collections.Generic.List<string>();
+
+            Console.WriteLine("Записи за последний час:");
+            int counters = 0; // <-------------------------------------------------------------- для подсчёта 
+            // Перебираем строки и отбираем записи за последний час
+            for (int i = 0; i < logEntries.Length; i++)
+            {
+                if (logEntries[i].StartsWith("Date -"))//сначало считывается такой формат
+                {
+                    string datePart = logEntries[i].Substring(7).Trim();//начинаем с 7 симвроа потому что дата и пробьелы 
+                    /*Substring — это метод строкового класса String в C#, который позволяет извлечь подстроку из строки. Он возвращает часть строки, начиная с указанного индекса, и (опционально) заданной длины.*/
+
+                    // Пытаемся преобразовать дату в объект DateTime
+                    if (DateTime.TryParse(datePart, out DateTime logDate))//преобразовываем  в обект чтобы сравнито с текщим
+                    {
+                        // Проверяем, находится ли дата в последнем часу
+                        if (logDate > currentDateTime.AddHours(-1) && logDate <= currentDateTime)//лог(в файле) должно быть больше чем прошлый час и меньше или равно текущему времени
+                        {
+                            counters++;// <----------------------------------------------------------- тут считаем
+                            // Добавляем запись и связанные строки в список
+                            lastHourEntries.Add(logEntries[i]);//добавлем дату
+                            Console.WriteLine(logEntries[i]); // Вывод в консоль
+
+                            if (i + 1 < logEntries.Length)
+                            {
+                                lastHourEntries.Add(logEntries[i + 1]);
+                                Console.WriteLine(logEntries[i + 1]); // Вывод в консоль
+                            }
+                            //Проверяется, существуют ли в массиве следующие 1–2 строки (с индексами i + 1 и i + 2), чтобы избежать выхода за пределы массива.
+                            if (i + 2 < logEntries.Length)
+                            {
+                                lastHourEntries.Add(logEntries[i + 2]);
+                                Console.WriteLine(logEntries[i + 2]); // Вывод в консоль
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Перезаписываем файл только записями за последний час
+            File.WriteAllLines(filePath, lastHourEntries);
+
+            Console.WriteLine("Количество записей на момент просмотра файла, перед удалением: {0}", counters);
+            Console.WriteLine("Файл обновлён. Остались только записи за последний час.");
+        }
     }
 
     // Класс для получения информации о дисках
-    public class BNADiskInfo
+    /*2)Создать класс XXXDiskInfo c методами для вывода информации о
+    a. свободном месте на диске
+    b. Файловой системе
+    c. Для каждого существующего диска - имя, объем, доступный
+    объем, метка тома.
+    d. Продемонстрируйте работу класса
+    */
+    public class KVVDiskInfo
     {
-        // Метод для получения информации о свободном месте на диске
+        //2a) Метод для получения информации о свободном месте на диске
         public static void GetFreeDiskSpace(string driveName)
         {
             DriveInfo drive = new DriveInfo(driveName); // Получение информации о диске
-            if (drive.IsReady) // Проверка доступности диска
+            if (drive.IsReady) // Проверка доступности диска есть ли ответ от диска
             {
                 Console.WriteLine($"Свободное место на диске {drive.Name}: {drive.AvailableFreeSpace / (1024 * 1024 * 1024)} ГБ"); // Вывод информации о свободном месте
             }
@@ -66,7 +143,7 @@ namespace Lab12 // Объявление пространства имен Lab12
             }
         }
 
-        // Метод для получения информации о файловой системе
+        //2b. Метод для получения информации о файловой системе
         public static void GetFileSystemInfo(string driveName)
         {
             DriveInfo drive = new DriveInfo(driveName); // Получение информации о диске
@@ -80,7 +157,7 @@ namespace Lab12 // Объявление пространства имен Lab12
             }
         }
 
-        // Метод для вывода информации по всем существующим дискам
+        //2 c. Метод для получения информации о всех существующих дисках
         public static void GetAllDrivesInfo()
         {
             DriveInfo[] drives = DriveInfo.GetDrives(); // Получение массива дисков
@@ -105,9 +182,15 @@ namespace Lab12 // Объявление пространства имен Lab12
     }
 
     // Класс для работы с файлами
-    public class BNAFileInfo
+    /*3 Создать класс XXXFileInfo c методами для вывода информации о
+    конкретном файле
+    a. Полный путь
+    b. Размер, расширение, имя
+    c. Дата создания, изменения
+    d. Продемонстрируйте работу класса*/
+    public class KVVFileInfo
     {
-        // Метод для вывода полного пути файла
+        // 3a. Метод для получения полного пути к файлу
         public static void GetFullPath(string filePath)
         {
             if (File.Exists(filePath)) // Проверка существования файла
@@ -121,7 +204,7 @@ namespace Lab12 // Объявление пространства имен Lab12
             }
         }
 
-        // Метод для вывода информации о размере, расширении и имени файла
+        //2b Метод для вывода информации о размере, расширении и имени файла
         public static void GetBasicInfo(string filePath)
         {
             if (File.Exists(filePath)) // Проверка существования файла
@@ -137,7 +220,7 @@ namespace Lab12 // Объявление пространства имен Lab12
             }
         }
 
-        // Метод для вывода информации о дате создания и изменения файла
+        //3 c. Метод для вывода информации о дате создания и изменения файла
         public static void GetFileInfo(string filePath)
         {
             if (File.Exists(filePath)) // Проверка существования файла
@@ -154,7 +237,14 @@ namespace Lab12 // Объявление пространства имен Lab12
     }
 
     // Класс для получения информации о директориях
-    public class BNADirInfo
+    /*. Создать класс XXXDirInfo c методами для вывода информации о конкретном
+директории
+    a. Количестве файлов
+    b. Время создания
+    c. Количестве поддиректориев
+    d. Список родительских директориев
+    e. Продемонстрируйте работу класса*/
+    public class KVVDirInfo
     {
         public static void GetDirInfo(string dirName)
         {
@@ -163,13 +253,26 @@ namespace Lab12 // Объявление пространства имен Lab12
                               "\nFiles amount:   " + dirInfo.GetFiles().Length + // Вывод количества файлов
                               "\nCreating time:  " + dirInfo.LastWriteTime + // Вывод времени создания
                               "\nSubDirs amount: " + dirInfo.GetDirectories().Length + // Вывод количества поддиректорий
-                              "\nParent dir: " +     dirInfo.Parent.Name); // Вывод родительской директории
-            BNALog.Write("GetFileInfo", dirName); // Логирование действия
+                              "\nParent dir: " + dirInfo.Parent.Name); // Вывод родительской директории
+            KVVLog.Write("GetFileInfo", dirName); // 1)Логирование действия
         }
     }
 
     // Класс для управления файлами и директориями
-    public class BNAFileManager
+    /*Создать класс XXXFileManager. Набор методов определите
+самостоятельно. С его помощью выполнить следующие действия:
+a. Прочитать список файлов и папок заданного диска. Создать
+директорий XXXInspect, создать текстовый файл
+xxxdirinfo.txt и сохранить туда информацию. Создать
+копию файла и переименовать его. Удалить
+первоначальный файл.
+b. Создать еще один директорий XXXFiles. Скопировать в
+него все файлы с заданным расширением из заданного
+пользователем директория. Переместить XXXFiles в
+XXXInspect.
+c. Сделайте архив из файлов директория XXXFiles.
+Разархивируйте его в другой директорий*/
+    public class KVVFileManager
     {
         // a. Чтение списка файлов и папок, создание директории и текстового файла, запись информации и удаление исходного файла
         public static void GetAllFilesAndDir(string driveName)
@@ -182,11 +285,11 @@ namespace Lab12 // Объявление пространства имен Lab12
             }
 
             // Создание директории XXXInspect
-            string inspectDir = Path.Combine(driveName, "BNAInspect");
+            string inspectDir = Path.Combine(driveName, "BNAInspect");//комбинирует путь и доболяет 
             Directory.CreateDirectory(inspectDir);
 
             // Создание и запись в текстовый файл xxxdirinfo.txt
-            string filePath = Path.Combine(inspectDir, "BNAdirinfo.txt");
+            string filePath = Path.Combine(inspectDir, "BNAdirinfo.txt");//путь к файлу 
             using (StreamWriter writer = new StreamWriter(filePath))
             {
                 // Записываем список файлов и папок
@@ -203,7 +306,7 @@ namespace Lab12 // Объявление пространства имен Lab12
 
             // Копирование и переименование файла
             string copyFilePath = Path.Combine(inspectDir, "BNAdirinfo_copy.txt");
-            if (File.Exists(copyFilePath))
+            if (File.Exists(copyFilePath))//существует ли
             {
                 File.Delete(copyFilePath); // Удаление, если директория уже существует
             }
@@ -222,30 +325,30 @@ namespace Lab12 // Объявление пространства имен Lab12
             }
 
             // Создание директории XXXFiles
-            string filesDir = Path.Combine(sourceDir, "BNAFiles");
+            string filesDir = Path.Combine(sourceDir, "BNAFiles");//параметр который мы передаем
             Directory.CreateDirectory(filesDir);
 
             // Копирование файлов с указанным расширением
             foreach (var file in Directory.GetFiles(sourceDir, $"*{extension}"))
             {
                 string fileName = Path.GetFileName(file);
-                string destFile = Path.Combine(filesDir, fileName);
-                File.Copy(file, destFile, true);
+                string destFile = Path.Combine(filesDir, fileName);//чтобы в копию записатот путь и файл
+                File.Copy(file, destFile, true);//лдля перезаписи
             }
 
             // Перемещение директории XXXFiles в XXXInspect
-            string inspectDir = Path.Combine(sourceDir, "BNAInspect");
+            string inspectDir = Path.Combine(sourceDir, "BNAInspect");//еще один директорий
             if (!Directory.Exists(inspectDir))
             {
                 Directory.CreateDirectory(inspectDir);
             }
 
-            string newFilesDir = Path.Combine(inspectDir, "BNAFiles");
+            string newFilesDir = Path.Combine(inspectDir, "BNAFiles");//комбинируем файл
             if (Directory.Exists(newFilesDir))
             {
                 Directory.Delete(newFilesDir, true); // Удаление, если директория уже существует
             }
-            Directory.Move(filesDir, newFilesDir);
+            Directory.Move(filesDir, newFilesDir);//переместить из файлс 
         }
 
         // c. Создание архива из директории XXXFiles и разархивация его в другую директорию
@@ -277,7 +380,7 @@ namespace Lab12 // Объявление пространства имен Lab12
             Directory.CreateDirectory(extractPath);
 
 
-            ZipFile.ExtractToDirectory(zipPath, extractPath);
+            ZipFile.ExtractToDirectory(zipPath, extractPath);//перенести из зип в папку
 
             Console.WriteLine("Архивирование и разархивирование выполнено успешно.");
         }
@@ -287,15 +390,19 @@ namespace Lab12 // Объявление пространства имен Lab12
     {
         public static void Main(string[] args)
         {
-            BNADiskInfo.GetFreeDiskSpace("D"); // Получение информации о свободном месте на диске D
-            BNAFileInfo.GetFullPath("lab12.exe"); // Получение полного пути к файлу lab12.exe
-            BNAFileInfo.GetFileInfo("lab12.exe"); // Получение информации о файле lab12.exe
-            BNADirInfo.GetDirInfo("test"); // Получение информации о директории Test
-            BNAFileManager.GetAllFilesAndDir("..\\net8.0"); // Получение всех файлов и директорий по пути ..\net8.0
-            BNAFileManager.CopyFilesWithExtension("..\\net8.0", ".txt"); // b
-            BNAFileManager.ArchiveAndExtractFiles("..\\net8.0");
+            KVVDiskInfo.GetFreeDiskSpace("D"); // Получение информации о свободном месте на диске D
+            KVVFileInfo.GetFullPath("lab12.exe"); // Получение полного пути к файлу lab12.exe
+            KVVFileInfo.GetFileInfo("lab12.exe"); // Получение информации о файле lab12.exe
+            KVVDirInfo.GetDirInfo("test"); // Получение информации о директории Test
+            KVVFileManager.GetAllFilesAndDir("..\\net8.0"); // Получение всех файлов и директорий по пути ..\net8.0
+            KVVDiskInfo.GetFileSystemInfo("D");
+            KVVFileManager.CopyFilesWithExtension("..\\net8.0", ".txt"); // b
+            KVVFileManager.ArchiveAndExtractFiles("..\\net8.0");
 
+            string logFilePath = "ExtractedFiles/BNAlogfile.txt";
 
+            // Читаем и выводим записи за последний час
+            KVVLog.FilterAndSaveLastHourEntries(logFilePath);
         }
-     }
+    }
 }

@@ -16,15 +16,6 @@ FST::NODE(1, FST::RELATION('f', 2)),\
 FST::NODE())
 #pragma endregion
 
-#define FST_WHILE FST::FST(6, \
-	FST::NODE(1, FST::RELATION('w', 1)), \
-	FST::NODE(1, FST::RELATION('h', 2)), \
-	FST::NODE(1, FST::RELATION('i', 3)), \
-	FST::NODE(1, FST::RELATION('l', 4)), \
-	FST::NODE(1, FST::RELATION('e', 5)), \
-	FST::NODE())
-
-
 
 #pragma region UINT
 #define FST_UINT FST::FST(5,\
@@ -165,7 +156,7 @@ FST::NODE())
 
 #pragma region RIGHTBITWISE
 #define FST_RIGHTBITWISE FST::FST(2,\
-FST::NODE(1, FST::RELATION('$', 1)),\
+FST::NODE(1, FST::RELATION('&', 1)),\
 FST::NODE())
 #pragma endregion
 
@@ -412,7 +403,7 @@ FST::NODE())
 
 #pragma region INTEGER_LITERAL
 #define FST_INTEGER_LITERAL FST::FST(2,\
-FST::NODE(20,\
+FST::NODE(34,\
 FST::RELATION('0', 0), FST::RELATION('0', 1),\
 FST::RELATION('1', 0), FST::RELATION('1', 1),\
 FST::RELATION('2', 0), FST::RELATION('2', 1),\
@@ -422,7 +413,14 @@ FST::RELATION('5', 0), FST::RELATION('5', 1),\
 FST::RELATION('6', 0), FST::RELATION('6', 1),\
 FST::RELATION('7', 0), FST::RELATION('7', 1),\
 FST::RELATION('8', 0), FST::RELATION('8', 1),\
-FST::RELATION('9', 0), FST::RELATION('9', 1)\
+FST::RELATION('9', 0), FST::RELATION('9', 1),\
+FST::RELATION('x', 0), FST::RELATION('x', 1),\
+FST::RELATION('a', 0), FST::RELATION('a', 1),\
+FST::RELATION('b', 0), FST::RELATION('b', 1),\
+FST::RELATION('c', 0), FST::RELATION('c', 1),\
+FST::RELATION('d', 0), FST::RELATION('d', 1),\
+FST::RELATION('e', 0), FST::RELATION('e', 1),\
+FST::RELATION('f', 0), FST::RELATION('f', 1)\
 ),\
 FST::NODE())
 #pragma endregion 

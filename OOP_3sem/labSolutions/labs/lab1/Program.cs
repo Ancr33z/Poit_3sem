@@ -93,7 +93,7 @@ class Program
         Console.WriteLine($"Максимум: {result.Max}, Минимум: {result.Min}, Сумма: {result.Sum}, Первая буква: {result.FirstLetter}");
 
 
-        var temp = "privet"; 
+        var temp = "privet";
 
         Console.WriteLine($"{temp}"); /// privet
 
@@ -284,7 +284,7 @@ class Program
         var tuple2 = (15, "Hello", 'A', "World", 89UL);
         var tuple3 = (26, "Hello", 'B', "World", 921UL);
 
-        Console.WriteLine(tuple1 == tuple2); 
-        Console.WriteLine(tuple1 == tuple3); 
+        Console.WriteLine(tuple1 == tuple2);
+        Console.WriteLine(tuple1 == tuple3);
     }
 }

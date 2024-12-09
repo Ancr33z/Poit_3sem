@@ -158,7 +158,7 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 			break;
 		}
 		case LEX_IF:
-		{//сюда 
+		{
 			int checkerElseIndex = i;
 			while (lextable.table[checkerElseIndex].lexeme != LEX_RIGHT_SQUARE_BRACE)
 			{
@@ -184,27 +184,6 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 			ifsn = lextable.table[i].sn;
 			currentLogicOperator = lextable.table[i + 3].lexeme;
 			Gener::LogicOperations(AsmFile, lextable.table[i + 3].lexeme, ifsn);
-			break;
-		}
-		case LEX_WHILE:
-		{
-			whileExist = true;
-			whilesn = lextable.table[i].sn;
-			AsmFile << "TOWHILE" << whilesn << ":\n";
-			AsmFile <<
-				"push " << idtable.table[lextable.table[i + 2].idxTI].scope << idtable.table[lextable.table[i + 2].idxTI].id;
-			if (idtable.table[lextable.table[i + 2].idxTI].idtype == IT::V)
-				AsmFile << IT::V;
-			AsmFile << std::endl;
-
-			AsmFile << "push " << idtable.table[lextable.table[i + 4].idxTI].scope << idtable.table[lextable.table[i + 4].idxTI].id;
-			if (idtable.table[lextable.table[i + 4].idxTI].idtype == IT::V)
-				AsmFile << IT::V;
-			AsmFile << std::endl << "pop ebx\npop eax\ncmp eax, ebx\n";
-			currentLogicOperator = lextable.table[i + 3].lexeme;
-			Gener::LogicOperations(AsmFile, lextable.table[i + 3].lexeme, whilesn);
-
-
 			break;
 		}
 		case LEX_RIGHT_SQUARE_BRACE:
@@ -266,6 +245,21 @@ int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdT
 				"jc OVERFLOW\n";
 			break;
 		}
+		case LEX_LEFTBITWISE:
+		{
+			AsmFile << "pop ebx" << std::endl
+				<< "pop eax" << std::endl << "shl eax, cl" << std::endl << "push eax" << std::endl
+				<< "jc OVERFLOW\n";
+			break;
+		}
+		case LEX_RIGHTBITWISE:
+		{
+			AsmFile << "pop ebx" << std::endl
+				<< "pop eax" << std::endl << "sar eax, cl" << std::endl << "push eax" << std::endl
+				<< "jc OVERFLOW\n";
+			break;
+		}
+
 		case LEX_DIRSLASH:
 		{
 			//idiv - знаковый , div - беззнаковый
@@ -308,16 +302,16 @@ int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdT
 			}
 			break;
 		}
-		case PL_AT:
-		{
-			AsmFile << "call " << idtable.table[LEXTABLE.table[i].idxTI].id << std::endl;
-			if (idtable.table[LEXTABLE.table[i].idxTI].idtype == IT::S)
-				AsmFile << " pop ecx\n";
-			AsmFile << " push eax\n";
+		//case PL_AT:
+		//{
+		//	AsmFile << "call " << idtable.table[LEXTABLE.table[i].idxTI].id << std::endl;
+		//	if (idtable.table[LEXTABLE.table[i].idxTI].idtype == IT::S)
+		//		AsmFile << " pop ecx\n";
+		//	AsmFile << " push eax\n";
 
 
-			break;
-		}
+		//	break;
+		//}
 		default:
 			break;
 		}
@@ -364,6 +358,21 @@ void Gener::LogicOperations(std::ofstream& AsmFile, char lex, int sn)
 
 		break;
 	}
+	case LEX_LEFTBITWISE:
+	{
+		AsmFile << "pop ebx" << std::endl
+			<< "pop eax" << std::endl << "shl eax, cl" << std::endl << "push eax" << std::endl
+			<< "jc OVERFLOW\n";
+		break;
+	}
+	case LEX_RIGHTBITWISE:
+	{
+		AsmFile << "pop ebx" << std::endl
+			<< "pop eax" << std::endl << "sar eax, cl" << std::endl << "push eax" << std::endl
+			<< "jc OVERFLOW\n";
+		break;
+	}
+
 	case LEX_NOTEQUAL:
 	{
 		AsmFile << "je SKIP" << sn << "\n";

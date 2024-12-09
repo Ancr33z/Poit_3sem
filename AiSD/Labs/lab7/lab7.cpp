@@ -44,11 +44,11 @@ void findLIS(int sequence[], int n) {
 
     // Основной цикл: вычисляем длины всех подпоследовательностей
     for (int i = 1; i < n; i++) {
-        //if (i == 1) continue;
-        //if (i == 7) continue;
+        if (i == 1) continue;
+        if (i == 7) continue;
         for (int j = 0; j < i; j++) {
-            //if (i == 1) continue;
-            //if (i == 7) continue;
+            if (i == 1) continue;
+            if (i == 7) continue;
 
             // Добавим проверку для выбора наименьших элементов при одинаковой длине
             if (sequence[i] > sequence[j] && dp[i] < dp[j] + 1) {

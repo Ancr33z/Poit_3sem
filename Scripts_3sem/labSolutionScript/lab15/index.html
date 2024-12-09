@@ -15,11 +15,11 @@
 
         <label for="surname">Фамилия</label>
         <input type="text" id="surname" name="surname">
-        <div class="error" id="surnameError">Поле не должно быть пустым и должно содержать только буквы.</div>
+        <div class="error" id="surnameError">Поле не должно превышать 20 символов и должно содержать только буквы.</div>
 
         <label for="name">Имя</label>
         <input type="text" id="name" name="name">
-        <div class="error" id="nameError">Поле не должно быть пустым и должно содержать только буквы.</div>
+        <div class="error" id="nameError">Поле не должно превышать 20 символов и должно содержать только буквы.</div>
 
         <label for="email">E-mail</label>
         <input type="email" id="email" name="email">
@@ -27,7 +27,7 @@
 
         <label for="phone">Телефон (0xx)xxx-xx-xx</label>
         <input type="text" id="phone" name="phone">
-        <div class="error" id="phoneError">Поле должно быть заполнено в формате (0xx)xxx-xx-xx.</div>
+        <div class="error" id="phoneError">Поле должно быть заполнено.</div>
 
         <label for="city">Город</label>
         <select id="city" name="city">
@@ -41,6 +41,7 @@
                 <input type="checkbox" id="bgtu" name="bgtu"> Я учусь в БГТУ
             </label>
         </div>
+        <div class="error" id="bgtuError">Это поле обязательно</div>
 
         <div class="radio-group">
             <label>На каком курсе Вы учитесь?</label>
@@ -48,6 +49,7 @@
             <label><input type="radio" name="course" value="2"> 2</label>
             <label><input type="radio" name="course" value="3"> 3</label>
             <label><input type="radio" name="course" value="4"> 4</label>
+            <div class="error" id="courseError">Это поле обязательно</div>
         </div>
 
         <label for="about">Расскажите о себе</label>

@@ -169,7 +169,6 @@ bool MFST::Mfst::start(std::ostream& outputStream) {
 	switch (rc_step) {
 	case Mfst::RC_STEP::TAPE_END:
 		MFST_TRACE4("------>TAPE_END", outfile);
-		outputStream << "-------------------------------------------------------------------------------------" << std::endl;
 		outputStream << "Синтаксический анализ выполнен без ошибок\n";
 		output = true;
 		break;

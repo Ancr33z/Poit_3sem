@@ -66,6 +66,7 @@ void Log::WriteIn(LOG log, In::IN in) {
 		"Количество символов: " << in.size << std::endl <<
 		"Проигнорировано: " << in.ignor << std::endl <<
 		"Количество строк: " << in.lines << std::endl;
+	*log.stream << "-------------------------------------------------------------------------------------" << std::endl;
 }
 
 void Log::WriteError(LOG log, Error::ERROR error) {

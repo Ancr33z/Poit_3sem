@@ -1,26 +1,32 @@
 $(document).ready(function () {
     $('#submitBtn').on('click', function () {
         let isValid = true;
-        let confirmat = false;
+        let confirmat = true; // Флаг подтверждения
 
-        const nameRegex = /^[a-zA-Zа-яА-Я]{1,20}$/;
+        // Регулярное выражение для проверки только букв русского и английского алфавита
+        const nameRegex = /^[a-zA-Zа-яА-Я]+$/;
         const emailRegex = /^[^\s@]+@[a-zA-Z]{2,5}\.[a-zA-Z]{2,3}$/;
         const phoneRegex = /^\(0\d{2}\)\d{3}-\d{2}-\d{2}$/;
 
-        if (!nameRegex.test($('#surname').val())) {
+        // Проверка фамилии
+        const surname = $('#surname').val();
+        if (surname.length > 20 || !nameRegex.test(surname)) {
             $('#surnameError').show();
             isValid = false;
         } else {
             $('#surnameError').hide();
         }
 
-        if (!nameRegex.test($('#name').val())) {
+        // Проверка имени
+        const name = $('#name').val();
+        if (name.length > 20 || !nameRegex.test(name)) {
             $('#nameError').show();
             isValid = false;
         } else {
             $('#nameError').hide();
         }
 
+        // Проверка email
         if (!emailRegex.test($('#email').val())) {
             $('#emailError').show();
             isValid = false;
@@ -28,6 +34,7 @@ $(document).ready(function () {
             $('#emailError').hide();
         }
 
+        // Проверка телефона
         if (!phoneRegex.test($('#phone').val())) {
             $('#phoneError').show();
             isValid = false;
@@ -35,6 +42,7 @@ $(document).ready(function () {
             $('#phoneError').hide();
         }
 
+        // Проверка поля "О себе"
         if ($('#about').val().length > 250 || $('#about').val().trim() === "") {
             $('#aboutError').show();
             isValid = false;
@@ -42,21 +50,37 @@ $(document).ready(function () {
             $('#aboutError').hide();
         }
 
+        // Проверка, выбрано ли "Я учусь в БГТУ"
+        if (!$('#bgtu').is(':checked')) {
+            $('#bgtuError').show();
+            isValid = false;
+        } else {
+            $('#bgtuError').hide();
+        }
+
+        // Проверка, выбран ли курс обучения
+        if (!$('input[name="course"]:checked').val()) {
+            $('#courseError').show();
+            isValid = false;
+        } else {
+            $('#courseError').hide();
+        }
+
+        // Проверка города и курса для уточнения
         const city = $('#city').val();
         const course = $('input[name="course"]:checked').val();
         const isStudentAtBGTU = $('#bgtu').is(':checked');
 
-        if (city !== 'Минск' || course !== '3' || !isStudentAtBGTU) {
-            if (!confirm("Вы уверены в своем ответе?")) {
-                confirmat = false;
-                isValid = true;
-            }
+        // Если выбраны значения, отличные от стандартных (например, город не Минск или курс не 3)
+        if (city !== 'Минск' || course !== '2' || !isStudentAtBGTU) {
+            confirmat = confirm("Вы уверены в своем ответе?"); // Модальное окно
         }
 
+        // Если форма валидна и пользователь подтвердил свои ответы
         if (isValid && confirmat) {
             alert("Форма успешно отправлена!");
-        } else if (isValid) {
-            alert("Пожалуйста, исправьте ошибки перед отправкой.");
+        } else if (!isValid) {
+            alert("Пожалуйста, проверьте свои ответы.");
         }
     });
 });

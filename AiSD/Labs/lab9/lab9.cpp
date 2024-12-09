@@ -1,201 +1,274 @@
-﻿#include <iostream> // Подключение библиотеки ввода-вывода
-#include<vector> // Подключение библиотеки для работы с векторами
-#include<algorithm> // Подключение библиотеки алгоритмов
-#include <limits.h> // Подключение библиотеки для работы с константами пределов значений
-#include <Windows.h> // Подключение библиотеки Windows
-#include <random> // Подключение библиотеки для работы с генерацией случайных чисел
-using namespace std; // Использование пространства имен std
+﻿#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <limits.h>
+#include <string>
+#include <random>
+using namespace std;
 
-//#define V 5 // Определение константы для размера графа
-#define V 8 // Альтернативный размер графа
-
-int childsNumber = 0; // Число потомков в популяции
-int populationSize = 0; // Размер популяции
-int evolutionCirclsNumber = 0; // Количество циклов эволюции
-vector<int> nodes = { 1, 2, 3, 4, 5, 6, 7 }; // Вектор узлов графа
-
-//int map[V][V] = { { INT_MAX, 25, 40, 31, 27}, // Определение матрицы смежности для графа
-//                { 5, INT_MAX, 17, 30, 25},
-//                { 19, 15, INT_MAX, 6, 1},
-//                { 9, 50, 24, INT_MAX, 6 },
-//                { 22, 8, 7, 10, INT_MAX },
-//};
-
-int map[V][V] = {
-    {INT_MAX, 25, 40, 31, 27, 16, 7, 9 }, // Расстояния от города 0 до всех остальных
-    {5, INT_MAX, 17, 30, 25, 4, 23, 23}, // Расстояния от города 1 до всех остальных
-    {19, 15, INT_MAX, 6, 1, 19, 10, 8}, // Расстояния от города 2 до всех остальных
-    {9, 50, 24, INT_MAX, 6, 6, 12, 11}, // Расстояния от города 3 до всех остальных
-    {22, 8, 7, 10, INT_MAX, 19, 10, 9}, // Расстояния от города 4 до всех остальных
-    {9, 50, 24, 6, 11, INT_MAX, 11, 18}, // Расстояния от города 5 до всех остальных
-    {9, 50, 24, 6, 6, 14, INT_MAX, 10}, // Расстояния от города 6 до всех остальных
-    {9, 50, 24, 6, 6, 12, 15, INT_MAX} // Расстояния от города 7 до всех остальных
+struct individual {
+    string genome;       // Геном особи
+    int adaptability;    // Приспособленность особи (длина маршрута)
 };
 
-struct individual { // Структура для представления особи в популяции
-    string genome; // Геном особи
-    int adaptability; // Приспособленность особи
+vector<vector<int>> graph = { // Изначальная матрица смежности
+    {INT_MAX, 25, 40, 31, 27, 16, 7, 9},
+    {5, INT_MAX, 17, 30, 25, 4, 23, 23},
+    {19, 15, INT_MAX, 6, 1, 19, 10, 8},
+    {9, 50, 24, INT_MAX, 6, 6, 12, 11},
+    {22, 8, 7, 10, INT_MAX, 19, 10, 9},
+    {9, 50, 24, 6, 11, INT_MAX, 11, 18},
+    {9, 50, 24, 6, 6, 14, INT_MAX, 10},
+    {9, 50, 24, 6, 6, 12, 15, INT_MAX}
 };
 
-int generateRandomNumber(int start, int end) // Функция для генерации случайного числа в диапазоне
-{
-    return start + rand() % (end - start); // Генерирует случайное число от start до end
+vector<int> nodes;          // Список городов
+int populationSize = 0;     // Размер популяции
+int childsNumber = 0;       // Количество потомков при скрещивании
+int mutationRate = 0;       // Показатель мутации (в процентах)
+int evolutionCirclsNumber = 0; // Количество эволюций
+
+int generateRandomNumber(int start, int end) {
+    return start + rand() % (end - start);
 }
 
-bool isCorrect(string s, char ch) // Проверка корректности добавления узла в геном
-{
-    for (int i = 0; i < s.size(); i++) { // Проходим по каждому элементу строки
-        if (s[i] == ch) // Проверяем, не дублируется ли узел
-            return false;
+bool isCorrect(const string& s, char ch) {
+    for (char c : s) {
+        if (c == ch) return false;
     }
-    if (map[s[s.size() - 1] - 48][ch - 48] == INT_MAX) { // Проверяем допустимость пути
-        return false;
-    }
+    int from = s[s.size() - 1] - '0';
+    int to = ch - '0';
+    if (graph[from][to] == INT_MAX) return false;
     return true;
 }
 
-string mutatedGene(string genome) // Функция для мутации гена
-{
-    while (true) { // Бесконечный цикл, пока не будет выполнена мутация
-        int g1 = generateRandomNumber(1, V); // Генерация первого случайного гена
-        int g2 = generateRandomNumber(1, V); // Генерация второго случайного гена
-
-        if (g2 != g1) { // Проверка, чтобы гены были разными
-            char temp = genome[g1]; // Замена генов
-            genome[g1] = genome[g2];
-            genome[g2] = temp;
-
-            break; // Выход из цикла после выполнения замены
-        }
-    }
-    return genome; // Возвращаем мутированный геном
-}
-
-string createGenome() // Функция для создания генома
-{
-    vector<int> n = nodes; // Копирование узлов
-    string genome = "0"; // Начальный геном
-    while (true) { // Бесконечный цикл
-        if (genome.size() == V) { // Проверка длины генома
-            genome += genome[0]; // Замыкаем путь
+string mutatedGene(string genome) {
+    while (true) {
+        int g1 = generateRandomNumber(1, genome.size() - 1);
+        int g2 = generateRandomNumber(1, genome.size() - 1);
+        if (g1 != g2) {
+            swap(genome[g1], genome[g2]);
             break;
         }
-        int t;
-        if (n.size() == 1) { // Если остался один узел
-            t = 0;
+    }
+    return genome;
+}
+
+string createGenome() {
+    vector<int> n = nodes;
+    string genome = "0"; 
+    n.erase(n.begin());  
+    while (genome.size() < nodes.size()) {
+        int idx = generateRandomNumber(0, n.size());
+        int city = n[idx];
+        if (isCorrect(genome, char(city + '0'))) {
+            genome += char(city + '0');
+            n.erase(n.begin() + idx);
+        }
+    }
+    genome += genome[0]; 
+    return genome;
+}
+
+
+int calculateAdaptability(const string& genome) {
+    int distance = 0;
+    for (size_t i = 0; i < genome.size() - 1; i++) {
+        int from = genome[i] - '0';
+        int to = genome[i + 1] - '0';
+        if (graph[from][to] == INT_MAX) return INT_MAX;
+        distance += graph[from][to];
+    }
+    return distance;
+}
+
+bool compareAdaptability(individual t1, individual t2) {
+    return t1.adaptability < t2.adaptability;
+}
+
+void doGeneticAlgorithm() {
+    vector<individual> population;
+
+    for (int i = 0; i < populationSize; i++) {
+        string genome = createGenome();
+        int adaptability = calculateAdaptability(genome);
+        population.push_back({ genome, adaptability });
+    }
+
+    sort(population.begin(), population.end(), compareAdaptability);
+
+    for (int gen = 1; gen <= evolutionCirclsNumber; gen++) {
+        cout << "\nПоколение " << gen << "\n";
+
+        cout << "\nТекущая популяция:\n";
+        cout << "Маршрут\t\tДлина\n";
+        for (const auto& indiv : population) {
+            cout << indiv.genome << "\t\t" << indiv.adaptability << "\n";
+        }
+
+        cout << "\nЛучший маршрут: " << population[0].genome
+            << " Длина маршрута: " << population[0].adaptability << "\n";
+
+        vector<individual> new_population;
+
+        for (int i = 0; i < populationSize / 2; i += 2) {
+            individual parent1 = population[i];
+            individual parent2 = population[i + 1];
+
+            string childGenome1 = parent1.genome;
+            string childGenome2 = parent2.genome;
+
+            if (generateRandomNumber(0, 100) < mutationRate) {
+                childGenome1 = mutatedGene(childGenome1);
+            }
+            if (generateRandomNumber(0, 100) < mutationRate) {
+                childGenome2 = mutatedGene(childGenome2);
+            }
+
+            new_population.push_back({ childGenome1, calculateAdaptability(childGenome1) });
+            new_population.push_back({ childGenome2, calculateAdaptability(childGenome2) });
+        }
+
+        cout << "\nПотомки текущего поколения:\n";
+        cout << "Маршрут\t\tДлина\n";
+        for (const auto& indiv : new_population) {
+            cout << indiv.genome << "\t\t" << indiv.adaptability << "\n";
+        }
+
+        population.insert(population.end(), new_population.begin(), new_population.end());
+        sort(population.begin(), population.end(), compareAdaptability);
+        population.resize(populationSize);
+
+        if (population[0].adaptability == INT_MAX) {
+            cout << "Решение не найдено. Завершение алгоритма.\n";
+            break;
+        }
+    }
+
+    cout << "\nНаиболее оптимальный маршрут: " << population[0].genome
+        << " с длиной: " << population[0].adaptability << "\n";
+}
+
+void setupParameters() {
+    cout << "Настройка параметров генетического алгоритма\n";
+
+    cout << "Введите размер популяции: ";
+    cin >> populationSize;
+
+    while (populationSize <= 0) {
+        cout << "Размер популяции должен быть положительным числом. Повторите ввод: ";
+        cin >> populationSize;
+    }
+
+    cout << "Введите количество потомков при скрещивании (целое положительное число): ";
+    cin >> childsNumber;
+
+    while (childsNumber <= 0) {
+        cout << "Количество потомков должно быть положительным числом. Повторите ввод: ";
+        cin >> childsNumber;
+    }
+
+    cout << "Введите показатель мутации (в процентах от 0 до 100): ";
+    cin >> mutationRate;
+
+    while (mutationRate < 0 || mutationRate > 100) {
+        cout << "Показатель мутации должен быть от 0 до 100. Повторите ввод: ";
+        cin >> mutationRate;
+    }
+
+    cout << "Введите количество циклов эволюции (положительное число): ";
+    cin >> evolutionCirclsNumber;
+
+    while (evolutionCirclsNumber <= 0) {
+        cout << "Количество циклов эволюции должно быть положительным числом. Повторите ввод: ";
+        cin >> evolutionCirclsNumber;
+    }
+
+    cout << "\nНастройки завершены.\n";
+}
+
+void printGraph() {
+    cout << "\nГраф (матрица смежности):\n";
+    cout << "   ";
+    for (int i = 0; i < graph.size(); i++) {
+        cout << i << "\t";
+    }
+    cout << endl;
+    for (int i = 0; i < graph.size(); i++) {
+        cout << i << " ";
+        for (int val : graph[i]) {
+            if (val == INT_MAX) cout << "INF\t";
+            else cout << val << "\t";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    srand(time(0));
+
+    nodes.resize(graph.size());
+    for (int i = 0; i < nodes.size(); i++) nodes[i] = i;
+
+    while (true) {
+        cout << "\nМеню:\n"
+            << "1. Показать граф\n"
+            << "2. Добавить город\n"
+            << "3. Удалить город\n"
+            << "4. Установить дорогу\n"
+            << "5. Настроить параметры и запустить алгоритм\n"
+            << "6. Выход\n"
+            << "Ваш выбор: ";
+        int choice;
+        cin >> choice;
+
+        if (choice == 1) {
+            printGraph();
+        }
+        else if (choice == 2) {
+            for (auto& row : graph) row.push_back(INT_MAX);
+            graph.emplace_back(graph.size() + 1, INT_MAX);
+            nodes.push_back(nodes.size());
+            cout << "Город добавлен. Теперь их " << graph.size() << ".\n";
+        }
+        else if (choice == 3) {
+            int city;
+            cout << "Введите номер города для удаления: ";
+            cin >> city;
+            if (city < 0 || city >= graph.size()) {
+                cout << "Город с таким номером не существует.\n";
+                continue;
+            }
+            graph.erase(graph.begin() + city);
+            for (auto& row : graph) row.erase(row.begin() + city);
+            nodes.erase(remove(nodes.begin(), nodes.end(), city), nodes.end());
+            for (int i = 0; i < nodes.size(); i++) nodes[i] = i;
+            cout << "Город " << city << " удален.\n";
+        }
+        else if (choice == 4) {
+            int from, to, weight;
+            cout << "Введите номера городов (откуда и куда) и расстояние: ";
+            cin >> from >> to >> weight;
+            if (from < 0 || from >= graph.size() || to < 0 || to >= graph.size()) {
+                cout << "Неверные номера городов.\n";
+                continue;
+            }
+            graph[from][to] = weight;
+            graph[to][from] = weight;
+            cout << "Дорога между " << from << " и " << to << " установлена с расстоянием " << weight << ".\n";
+        }
+        else if (choice == 5) {
+            setupParameters();
+            doGeneticAlgorithm();
+        }
+        else if (choice == 6) {
+            break;
         }
         else {
-            t = generateRandomNumber(0, n.size() - 1); // Случайный выбор узла
-        }
-        int temp = n[t];
-        if (isCorrect(genome, (char)(temp + 48))) { // Проверка корректности добавления узла
-            genome += (char)(temp + 48); // Добавление узла в геном
-            n.erase(n.begin() + t); // Удаление узла из списка
+            cout << "Неверный выбор. Попробуйте снова.\n";
         }
     }
-    return genome; // Возвращаем сгенерированный геном
-}
 
-int calculateAdaptability(string genome) // Функция для расчета приспособленности генома
-{
-    int distance = 0;
-
-    for (int i = 0; i < genome.size() - 1; i++) { // Проходим по каждому гену в геноме
-        if (map[genome[i] - 48][genome[i + 1] - 48] == INT_MAX) // Проверка допустимости пути
-            return INT_MAX; // Возвращаем максимальное значение, если путь недопустим
-
-        distance += map[genome[i] - 48][genome[i + 1] - 48]; // Добавляем расстояние к общей дистанции
-    }
-
-    return distance; // Возвращаем общую приспособленность генома (сумму расстояний)
-}
-
-bool compareAdapdability(struct individual t1, struct individual t2) // Функция сравнения по приспособленности
-{
-    return t1.adaptability < t2.adaptability; // Сравниваем приспособленность двух особей
-}
-
-void doGeneticAlgorithm(int map[V][V]) // Основная функция генетического алгоритма
-{
-    vector<struct individual> population; // Вектор для хранения популяции
-    struct individual temp;
-
-    for (int i = 0; i < populationSize; i++) { // Создаем начальную популяцию
-        temp.genome = createGenome(); // Генерируем геном
-        temp.adaptability = calculateAdaptability(temp.genome); // Рассчитываем приспособленность
-        population.push_back(temp); // Добавляем в популяцию
-    }
-
-    cout << "\nСтартовая популяция: " << endl;
-    cout << "Геном популяци \tвес генома\n";
-    for (int i = 0; i < populationSize; i++) // Выводим стартовую популяцию
-        cout << population[i].genome << "\t\t"
-        << population[i].adaptability << endl;
-    cout << "\n";
-
-    sort(population.begin(), population.end(), compareAdapdability); // Сортировка популяции по приспособленности
-
-    int circl = 1;
-    while (circl <= evolutionCirclsNumber) { // Основной цикл эволюции
-        cout << endl << "Лучший геном: " << population[0].genome;
-        cout << " его вес: " << population[0].adaptability << "\n\n";
-
-        vector<struct individual> new_population;
-
-        for (int i = 0; i < childsNumber; i++) { // Генерация потомков
-
-            struct individual parent1 = population[i]; // Выбор родителя 1
-            struct individual parent2 = population[i + 1]; // Выбор родителя 2
-
-            while (true)
-            {
-                string new_genome = mutatedGene(parent1.genome); // Мутация гена
-                struct individual new_gene;
-                new_gene.genome = new_genome;
-                new_gene.adaptability = calculateAdaptability(new_gene.genome); // Расчет приспособленности
-
-                if (new_gene.adaptability <= population[i].adaptability) { // Проверка приспособленности
-                    new_population.push_back(new_gene);
-                    break;
-                }
-                else {
-                    new_gene.adaptability = INT_MAX;
-                    new_population.push_back(new_gene);
-                    break;
-                }
-            }
-        }
-
-        for (int i = 0; i < childsNumber; i++) // Добавление потомков в популяцию
-        {
-            population.push_back(new_population[i]);
-        }
-        sort(population.begin(), population.end(), compareAdapdability); // Сортировка популяции
-
-        for (int i = 0; i < childsNumber; i++) // Удаление наименее приспособленных
-        {
-            population.pop_back();
-        }
-
-        cout << "Поколение " << circl << " \n";
-        cout << "Геном популяци \tвес генома\n";
-
-        for (int i = 0; i < populationSize; i++) // Вывод популяции
-            cout << population[i].genome << "\t\t"
-            << population[i].adaptability << endl;
-        circl++;
-    }
-    cout << "\n\nнаиболее оптимальный маршрут, найденный генетическим алгоритмом с текущими параметрами: ";
-    cout << population[0].genome;
-    cout << "\n\n";
-}
-
-int main() // Основная функция
-{
-    srand(time(0));
-    setlocale(LC_ALL, "ru"); // Установка локали
-    cout << "Введите размер популяций: "; cin >> populationSize;
-    cout << "Введите количество потомков в одной популяции: "; cin >> childsNumber;
-    cout << "Введите количество эволюционных циклов: "; cin >> evolutionCirclsNumber;
-    doGeneticAlgorithm(map); // Запуск генетического алгоритма
+    return 0;
 }

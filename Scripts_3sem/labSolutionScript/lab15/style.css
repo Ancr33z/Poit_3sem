@@ -40,13 +40,21 @@ select {
     border-radius: 4px;
 }
 
+
 .error {
     color: red;
     font-size: 0.9em;
-    margin-top: -10px;
-    margin-bottom: 10px;
     display: none;
-    /* Initially hidden */
+}
+
+.checkbox .error {
+    margin-left: 25px;
+    /* Отступ для checkbox */
+}
+
+.radio-group .error {
+    margin-top: 10px;
+    /* Отступ для блока радиокнопок */
 }
 
 .checkbox,

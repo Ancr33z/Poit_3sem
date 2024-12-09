@@ -5,7 +5,7 @@
 namespace GRB {
 #pragma region Rules
 	const Greibach greibach(NS('S'), TS('$'),
-		8,
+		9,
 		Rule(NS('S'), GRB_ERROR_SERIES + 0,//начало кода
 			7,
 			Rule::Chain(8, TS('m'), TS('{'), NS('N'), TS('r'), NS('E'), TS(';'), TS('}'), TS(';')),
@@ -18,11 +18,11 @@ namespace GRB {
 			Rule::Chain(12, TS('t'), TS('f'), TS('i'), TS('('), TS(')'), TS('{'), NS('N'), TS('r'), NS('E'), TS(';'), TS('}'), TS(';'))
 		),
 		Rule(NS('N'), GRB_ERROR_SERIES + 1,//выражения
-			23,
+			24,
 			Rule::Chain(4, TS('d'), TS('t'), TS('i'), TS(';')),
 			Rule::Chain(5, TS('d'), TS('t'), TS('i'), TS(';'), NS('N')),
 			Rule::Chain(6, TS('d'), TS('t'), TS('i'), TS('='), TS('l'), TS(';')),
-
+			Rule::Chain(7, TS('d'), TS('t'), TS('i'), TS('='), TS('l'), TS('Q'), TS(';')),
 
 			Rule::Chain(6, TS('d'), TS('t'), TS('i'), TS('='), NS('E'), TS(';')),
 			Rule::Chain(7, TS('d'), TS('t'), TS('i'), TS('='), NS('E'), TS(';'), NS('N')),
@@ -99,10 +99,10 @@ namespace GRB {
 			Rule::Chain(5, TS('@'), TS('('), NS('E'), TS(')'), NS('M')),
 			Rule::Chain(3, TS('@'), NS('E'), NS('M')),
 
-			Rule::Chain(2, TS('$'), NS('E')),
-			Rule::Chain(4, TS('$'), TS('('), NS('E'), TS(')')),
-			Rule::Chain(5, TS('$'), TS('('), NS('E'), TS(')'), NS('M')),
-			Rule::Chain(3, TS('$'), NS('E'), NS('M')),
+			Rule::Chain(2, TS('&'), NS('E')),
+			Rule::Chain(4, TS('&'), TS('('), NS('E'), TS(')')),
+			Rule::Chain(5, TS('&'), TS('('), NS('E'), TS(')'), NS('M')),
+			Rule::Chain(3, TS('&'), NS('E'), NS('M')),
 			
 			Rule::Chain(2, TS('*'), NS('E')),
 			Rule::Chain(4, TS('*'), TS('('), NS('E'), TS(')')),
@@ -158,7 +158,12 @@ namespace GRB {
 			2,
 			Rule::Chain(1, TS('i')),
 			Rule::Chain(1, TS('l'))
-		)
+		),
+		Rule(NS('Q'), GRB_ERROR_SERIES + 8,
+			2,
+			Rule::Chain(1, TS('i')),
+			Rule::Chain(2, TS('i'), TS('Q'))
+			)
 	);
 #pragma endregion
 

@@ -27,6 +27,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		log = Log::getlog(parm.log);
 		Log::WriteLog(log);
 		Log::WriteParm(log, parm);
+
 		In::IN in = In::getin(parm.in, parm.out);
 		Log::WriteIn(log, in);
 		LT::LexTable lextable = LT::Create(in.size);

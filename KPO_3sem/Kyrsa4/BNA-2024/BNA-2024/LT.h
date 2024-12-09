@@ -15,9 +15,6 @@
 #define LEX_POW					'P' //функция возведения в степень
 #define LEX_RAND				'R' //функция генерация случайных чисел
 #define LEX_MOD					'%' //получение остатка от деления
-//#define LEX_LENGTH				'L' //функция возвращает длину строки
-
-#define LEX_WHILE				'W'
 
 #define LEX_LITERAL				'l'
 #define LEX_FUNCTION			'f'
