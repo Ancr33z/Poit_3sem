@@ -272,6 +272,7 @@ short LA::Scan(LT::LexTable& lextable, IT::IdTable& idtable, In::IN& in, Parm::P
 	outfile.close();
 	return lexErrors;
 }
+
 void LA::WriteDataForFunctions(LT::LexTable& lextable, IT::IdTable& idtable)
 {
 	for (int i = 0; i < lextable.size; i++)
@@ -302,65 +303,84 @@ void LA::WriteDataForFunctions(LT::LexTable& lextable, IT::IdTable& idtable)
 		}
 	}
 }
-
 void LA::ShowIDtable(IT::IdTable& idtable, std::ofstream* outfile)
 {
 	*outfile << "----------------------------------------------------[ID таблица]--------------------------------------------" << std::endl;
-	*outfile << "[ID]----------[SCOPE]---------[TYPE]-----------[IDTYPE]----------[value]--------------[LEidX]---------------" << std::endl;
+	*outfile << std::left // Выравнивание текста по левому краю
+		<< std::setw(10) << "[ID]"
+		<< std::setw(15) << "[SCOPE]"
+		<< std::setw(10) << "[TYPE]"
+		<< std::setw(15) << "[IDTYPE]"
+		<< std::setw(20) << "[VALUE]"
+		<< std::setw(10) << "[LEidX]"
+		<< std::endl;
+	*outfile << "------------------------------------------------------------------------------------------------------------" << std::endl;
+
 	for (int i = 0; i < idtable.size; i++)
 	{
-		*outfile << '[' << i << "] " << idtable.table[i].id << "\t" << idtable.table[i].scope << "\t";
+		*outfile << std::left
+			<< std::setw(10) << ('[' + std::to_string(i) + ']') // Индекс идентификатора
+			<< std::setw(15) << idtable.table[i].scope // Область видимости
+			<< std::setw(10);
+
 		switch (idtable.table[i].iddatatype)
 		{
 		case IT::UINT:
-			*outfile << "INT\t";
+			*outfile << "INT";
 			break;
 		case IT::STR:
-			*outfile << "STR\t";
+			*outfile << "STR";
 			break;
 		default:
+			*outfile << "UNKNOWN";
 			break;
 		}
 
+		*outfile << std::setw(15);
 		switch (idtable.table[i].idtype)
 		{
 		case IT::IDTYPE::V:
-			*outfile << "variable\t";
+			*outfile << "Variable";
 			break;
 		case IT::IDTYPE::F:
-			*outfile << "function\t";
+			*outfile << "Function";
 			break;
 		case IT::IDTYPE::S:
-			*outfile << "std function\t";
+			*outfile << "Std Func";
 			break;
 		case IT::IDTYPE::L:
-			*outfile << "literal\t";
+			*outfile << "Literal";
 			break;
 		case IT::IDTYPE::P:
-			*outfile << "paramst\t";
+			*outfile << "Params";
 			break;
 		default:
+			*outfile << "Unknown";
 			break;
 		}
+
 		if (idtable.table[i].idtype == IT::IDTYPE::L)
 		{
 			if (idtable.table[i].iddatatype == IT::IDDATATYPE::UINT)
 			{
-				*outfile << idtable.table[i].value.vint;
+				*outfile << std::setw(20) << idtable.table[i].value.vint;
 			}
-
-			if (idtable.table[i].iddatatype == IT::IDDATATYPE::STR)
+			else if (idtable.table[i].iddatatype == IT::IDDATATYPE::STR)
 			{
-				*outfile << idtable.table[i].value.vstr.str;
+				*outfile << std::setw(20) << idtable.table[i].value.vstr.str;
 			}
 		}
-		else {
-			*outfile << "NULL";
+		else
+		{
+			*outfile << std::setw(20) << "NULL";
 		}
-		*outfile << '\t' << idtable.table[i].idxfirstLE << std::endl;
+
+		*outfile << std::setw(10) << idtable.table[i].idxfirstLE << std::endl;
 	}
+
 	*outfile << "------------------------------------------------------------------------------------------------------------" << std::endl;
 }
+
 void LA::ShowLexTable(LT::LexTable& lextable, std::ofstream* outfile)
 {
 	*outfile << "---------------------------------------[LEXTABLE]----------------------------------------------------------" << std::endl;

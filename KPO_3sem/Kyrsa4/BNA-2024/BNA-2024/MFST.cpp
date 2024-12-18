@@ -122,7 +122,7 @@ MFST::Mfst::RC_STEP MFST::Mfst::step() {
 			if ((nrule = greibach.getRule(st.top(), rule)) >= 0) {
 				GRB::Rule::Chain chain;
 				if ((nrulechain = rule.getNextChain(tape[tape_position], chain, nrulechain + 1)) >= 0) {
-					MFST_TRACE1(outfile)
+					MFST_TRACE1(outfile) 
 						save_state();
 					st.pop();
 					push_chain(chain);
@@ -177,8 +177,6 @@ bool MFST::Mfst::start(std::ostream& outputStream) {
 		MFST_TRACE4("------>NS_NORULE", outfile);
 		outputStream << "-------------------------------------------------------------------------------------" << std::endl;
 		outputStream << getDiagnosis(0) << std::endl;
-		outputStream << getDiagnosis(1) << std::endl;
-		outputStream << getDiagnosis(2) << std::endl;
 		break;
 
 	case Mfst::RC_STEP::NS_NORULECHAIN:

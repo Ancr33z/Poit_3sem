@@ -32,12 +32,12 @@ extern "C"
 			}
 		return len;
 	}
-	int  outnum(unsigned int value)
+	int  writenum(unsigned int value)
 	{
 		std::cout << value;
 		return 0;
 	}
-	int  outstr(char* ptr)
+	int  writestr(char* ptr)
 	{
 		setlocale(0,"");
 		if (ptr == nullptr)
@@ -48,13 +48,13 @@ extern "C"
 			std::cout << ptr[i];
 		return 0;
 	}
-	unsigned int  outnumline(unsigned int value)
+	unsigned int  writenumline(unsigned int value)
 	{
 		
 		std::cout << value << std::endl;
 		return 0;
 	}
-	unsigned int  outstrline(char* ptr)
+	unsigned int  writestrline(char* ptr)
 	{
 		setlocale(0, "");
 		

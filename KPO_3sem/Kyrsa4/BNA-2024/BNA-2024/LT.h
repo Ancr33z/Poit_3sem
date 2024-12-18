@@ -1,7 +1,7 @@
 #pragma once
 #define LT_MAXSIZE				4096
 #define LT_TI_NULLIDX			((int)0xffffffff)
-#define LEX_STRING				's'
+#define LEX_STRING				'c'
 
 #define LEX_UINT				'U'
 
@@ -29,7 +29,7 @@
 #define LEX_LEFTHESIS			'('
 #define LEX_RIGHTHESIS			')'
 
-#define LEX_LEFTBITWISE			'@'
+#define LEX_LEFTBITWISE			'?'
 #define LEX_RIGHTBITWISE		'&'
 #define LEX_PLUS				'+'
 #define LEX_MINUS				'-'

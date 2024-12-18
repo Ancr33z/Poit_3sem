@@ -7,21 +7,21 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 	std::ofstream AsmFile(ASM_PATH);
 	if (!AsmFile.is_open())
 	{
-		throw ERROR_THROW(101);//
+		throw ERROR_THROW(101);
 	}
-	bool gen_ok;
+	bool gen_ok;//для генерации
 	AsmFile << BEGIN;
 	AsmFile << ".const\n";
-	AsmFile << "ZEROMESSAGE " << " BYTE " << "\'Ошибка:деление на ноль\'," << 0 << std::endl;
+	AsmFile << "ZEROMESSAGE " << " BYTE " << "\'Ошибка:деление на ноль\'," << 0 << std::endl;//записали костанты
 	AsmFile << "OVERFLOWMESSAGE " << " BYTE " << "\'Ошибка:переполнение типа\'," << 0 << std::endl;
 	for (int i = 0; i < idtable.size; i++)
 	{
-		if (idtable.table[i].idtype == IT::L)
+		if (idtable.table[i].idtype == IT::L)//если наш тип айди == лликсеме по таблтице индентификатор
 		{
-			AsmFile << "\t" << idtable.table[i].scope << idtable.table[i].id;
-			if (idtable.table[i].iddatatype == IT::UINT)
+			AsmFile << "\t" << idtable.table[i].scope << idtable.table[i].id;//добав имя в файл асм и его идентификатор main10
+			if (idtable.table[i].iddatatype == IT::UINT)//проверям типа данных если UINT
 			{
-				AsmFile << " DWORD " << idtable.table[i].value.vint << std::endl;
+				AsmFile << " DWORD " << idtable.table[i].value.vint << std::endl;//записываем значение 
 			}
 			else if (idtable.table[i].iddatatype == IT::STR)
 			{
@@ -35,7 +35,7 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 
 	for (int i = 0; i < idtable.size; i++)
 	{
-		if (idtable.table[i].idtype == IT::IDTYPE::V)
+		if (idtable.table[i].idtype == IT::IDTYPE::V)//соответсвует ли наш тип из таблицы перменной
 		{
 			AsmFile << "\t" << idtable.table[i].scope << idtable.table[i].id << IT::V;
 			if (idtable.table[i].iddatatype == IT::STR)
@@ -49,17 +49,15 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 		}
 	}
 	AsmFile << "\n.code\n";
-	bool declaredMain = false;
+	bool declaredMain = false;//объявлен ли мэйн
 	bool declaredFunc = false;
 	int declaredFuncIndex;
-	int ifsn = 0;
+	int ifsn = 0;//if 
 	int elsefn = 0;
-	int whilesn = 0;
-	bool whileExist = false;
-	bool elseExist = false;
+	bool elseExist = false;//выход из if
 	bool ifExist = false;
-	char currentLogicOperator;
-	for (int i = 0; i < lextable.size; i++)
+	char currentLogicOperator;//логические операции
+	for (int i = 0; i < lextable.size; i++)//идем по лиексемам 
 	{
 		switch (lextable.table[i].lexeme)
 		{
@@ -68,14 +66,14 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 			declaredFunc = true;
 			i++;
 			declaredFuncIndex = i;
-			AsmFile << (idtable.table[lextable.table[i].idxTI]).id << " PROC ";
-			i += 2;
+			AsmFile << (idtable.table[lextable.table[i].idxTI]).id << " PROC ";//сначала имя функции потом PROC
+			i += 2;//изза скобок на две лексемы
 			while (lextable.table[i].lexeme != LEX_RIGHTHESIS)
 			{
 				if (lextable.table[i].lexeme == LEX_ID)
 				{
 
-					AsmFile << idtable.table[lextable.table[i].idxTI].scope << idtable.table[lextable.table[i].idxTI].id << IT::V << " : ";
+					AsmFile << idtable.table[lextable.table[i].idxTI].scope << idtable.table[lextable.table[i].idxTI].id << IT::V << " : ";//обявление функции с парметрами 
 					if (idtable.table[lextable.table[i].idxTI].iddatatype == IT::UINT)
 					{
 						AsmFile << " DWORD ";
@@ -103,29 +101,29 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 		}
 
 		case LEX_BRACELET:
-		{
+		{//если выход
 
 			if (declaredFunc)
 			{
-				AsmFile << "ZEROERROR:\npush OFFSET ZEROMESSAGE\ncall outstrline\npush -1\n\tcall\t\tExitProcess\n" <<
-					"OVERFLOW:\npush OFFSET OVERFLOWMESSAGE\ncall outstrline\npush -1\n\tcall\t\tExitProcess\n" << idtable.table[lextable.table[declaredFuncIndex].idxTI].id << " ENDP\n\n";
+				AsmFile << "ZEROERROR:\npush OFFSET ZEROMESSAGE\ncall writestrline\npush -1\n\tcall\t\tExitProcess\n" <<
+					"OVERFLOW:\npush OFFSET OVERFLOWMESSAGE\ncall writestrline\npush -1\n\tcall\t\tExitProcess\n" << idtable.table[lextable.table[declaredFuncIndex].idxTI].id << " ENDP\n\n";
 				declaredFunc = false;
 			}
 			else
 			{
-				AsmFile << "call\tsystem_pause\n \tcall\t\tExitProcess\nZEROERROR:\npush OFFSET ZEROMESSAGE\ncall outstrline\npush -1\n\tcall\t\tExitProcess\n" <<
-					"OVERFLOW:\npush OFFSET OVERFLOWMESSAGE\ncall outstrline\npush -1\n\tcall\t\tExitProcess\n" << " main ENDP\nEND main";
+				AsmFile << "call\tsystem_pause\n \tcall\t\tExitProcess\nZEROERROR:\npush OFFSET ZEROMESSAGE\ncall writestrline\npush -1\n\tcall\t\tExitProcess\n" <<
+					"OVERFLOW:\npush OFFSET OVERFLOWMESSAGE\ncall writestrline\npush -1\n\tcall\t\tExitProcess\n" << " main ENDP\nEND main";
 			}
 			declaredFuncIndex = 0;
 			break;
 		}
 		case LEX_RETURN:
 		{
-			i = Gener::GenExpHandler(AsmFile, lextable, idtable, ++i);
+			i = Gener::GenExpHandler(AsmFile, lextable, idtable, ++i);//вызываемая функция (ниже)
 			if (!declaredMain)
 			{
 
-				AsmFile << " \nret\n";
+				AsmFile << " \nret\n";//ретурн
 			}
 			else {
 				AsmFile << "push eax\n";
@@ -135,23 +133,23 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 		}
 		case LEX_PRINT:
 		{
-			IT::IDDATATYPE type = Gener::DetectType(lextable, idtable, i + 1);
+			IT::IDDATATYPE type = Gener::DetectType(lextable, idtable, i + 1);//(ниже)
 			i = Gener::GenExpHandler(AsmFile, lextable, idtable, ++i);
 			if (type == IT::UINT)
 			{
-				AsmFile << "push eax\ncall outnumline\n";
+				AsmFile << "push eax\ncall writenumline\n";
 			}
 			else if (type == IT::STR)
 			{
-				AsmFile << "push eax\ncall outstrline\n";
+				AsmFile << "push eax\ncall writestrline\n";
 			}
 			break;
 		}
 		case LEX_EQUALS:
 		{
-			int idx = lextable.table[i - 1].idxTI;
+			int idx = lextable.table[i - 1].idxTI;//получаем индекс ликсемы
 			i = Gener::GenExpHandler(AsmFile, lextable, idtable, ++i);
-			AsmFile << "push eax\npop " << idtable.table[idx].scope << idtable.table[idx].id;
+			AsmFile << "push eax\npop " << idtable.table[idx].scope << idtable.table[idx].id;//извлечет знаеыниф из стека
 			if (idtable.table[idx].idtype == IT::V)
 				AsmFile << IT::V;
 			AsmFile << std::endl;
@@ -167,22 +165,22 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 			if (lextable.table[checkerElseIndex + 1].lexeme == LEX_ELSE)
 			{
 				elseExist = true;
-				elsefn = lextable.table[checkerElseIndex + 1].sn;
+				elsefn = lextable.table[checkerElseIndex + 1].sn;//// Сохраняем номер строки для блока else 
 			}
 			ifExist = true;
 
 			AsmFile <<
-				"push " << idtable.table[lextable.table[i + 2].idxTI].scope << idtable.table[lextable.table[i + 2].idxTI].id;
+				"push " << idtable.table[lextable.table[i + 2].idxTI].scope << idtable.table[lextable.table[i + 2].idxTI].id;//Операнд помещается в стек с помощью команды push. Если это переменная (IT::V), добавляется суффикс.
 			if (idtable.table[lextable.table[i + 2].idxTI].idtype == IT::V)
 				AsmFile << IT::V;
 			AsmFile << std::endl;
 
-			AsmFile << "push " << idtable.table[lextable.table[i + 4].idxTI].scope << idtable.table[lextable.table[i + 4].idxTI].id;
+			AsmFile << "push " << idtable.table[lextable.table[i + 4].idxTI].scope << idtable.table[lextable.table[i + 4].idxTI].id;//записываем второй операнд
 			if (idtable.table[lextable.table[i + 4].idxTI].idtype == IT::V)
 				AsmFile << IT::V;
 			AsmFile << std::endl << "pop ebx\npop eax\ncmp eax, ebx\n";
-			ifsn = lextable.table[i].sn;
-			currentLogicOperator = lextable.table[i + 3].lexeme;
+			ifsn = lextable.table[i].sn;/// Запоминаем строку, где встретился if.
+			currentLogicOperator = lextable.table[i + 3].lexeme; // Фиксируем логическую операцию (например, >, <, ==).
 			Gener::LogicOperations(AsmFile, lextable.table[i + 3].lexeme, ifsn);
 			break;
 		}
@@ -201,11 +199,6 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 				AsmFile << "SKIPELSE" << elsefn << ":\n";
 				elseExist = false;
 			}
-			else if (whileExist)
-			{
-				AsmFile << "jmp TOWHILE" << whilesn << "\n";
-				AsmFile << "SKIP" << whilesn << ":\n";
-			}
 			break;
 		}
 		default:
@@ -219,7 +212,7 @@ bool Gener::CodeGeneration(LT::LexTable& lextable, IT::IdTable& idtable)
 
 }
 
-int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdTable& idtable, int i) {
+int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdTable& idtable, int i) {//
 	for (; LEXTABLE.table[i].lexeme != LEX_SEMICOLON; i++)
 	{
 		switch (LEXTABLE.table[i].lexeme)
@@ -238,6 +231,26 @@ int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdT
 				"jc OVERFLOW\n";
 			break;
 		}
+		case LEX_LEFTBITWISE:
+		{
+			AsmFile << "pop ebx" << std::endl;
+			AsmFile << "pop eax" << std::endl;        // Умножаем counter на 2 (counter ? 2)
+			AsmFile << "shl eax, 1" << std::endl;
+			AsmFile << "push eax " << std::endl;
+			AsmFile << "jc OVERFLOW\n";
+			break;
+		}
+		// idtable.table[lextable.table[i + 2].idxTI].scope
+
+		case LEX_RIGHTBITWISE:
+		{
+			AsmFile << "pop ebx" << std::endl;
+			AsmFile << "pop eax" << std::endl;
+			AsmFile << "sar eax, 1" << std::endl;
+			AsmFile << "push eax " << std::endl;
+			AsmFile << "jc OVERFLOW\n";
+			break;
+		}
 		case LEX_STAR:
 		{
 			AsmFile << "pop ebx" << std::endl <<
@@ -245,21 +258,6 @@ int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdT
 				"jc OVERFLOW\n";
 			break;
 		}
-		case LEX_LEFTBITWISE:
-		{
-			AsmFile << "pop ebx" << std::endl
-				<< "pop eax" << std::endl << "shl eax, cl" << std::endl << "push eax" << std::endl
-				<< "jc OVERFLOW\n";
-			break;
-		}
-		case LEX_RIGHTBITWISE:
-		{
-			AsmFile << "pop ebx" << std::endl
-				<< "pop eax" << std::endl << "sar eax, cl" << std::endl << "push eax" << std::endl
-				<< "jc OVERFLOW\n";
-			break;
-		}
-
 		case LEX_DIRSLASH:
 		{
 			//idiv - знаковый , div - беззнаковый
@@ -302,16 +300,16 @@ int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdT
 			}
 			break;
 		}
-		//case PL_AT:
-		//{
-		//	AsmFile << "call " << idtable.table[LEXTABLE.table[i].idxTI].id << std::endl;
-		//	if (idtable.table[LEXTABLE.table[i].idxTI].idtype == IT::S)
-		//		AsmFile << " pop ecx\n";
-		//	AsmFile << " push eax\n";
+		case PL_AT:
+		{
+			AsmFile << "call " << idtable.table[LEXTABLE.table[i].idxTI].id << std::endl;
+			if (idtable.table[LEXTABLE.table[i].idxTI].idtype == IT::S)
+				AsmFile << " pop ecx\n";
+			AsmFile << " push eax\n";
 
 
-		//	break;
-		//}
+			break;
+		}
 		default:
 			break;
 		}
@@ -320,13 +318,13 @@ int Gener::GenExpHandler(std::ofstream& AsmFile, LT::LexTable& LEXTABLE, IT::IdT
 	return i;
 }
 
-IT::IDDATATYPE Gener::DetectType(LT::LexTable lextable, IT::IdTable idtable, int i)
+IT::IDDATATYPE Gener::DetectType(LT::LexTable lextable, IT::IdTable idtable, int i)//опред тип в айди таблцице 
 {
 	for (; lextable.table[i].lexeme != LEX_SEMICOLON; i++)
 	{
 		if (lextable.table[i].idxTI != LT_TI_NULLIDX)
 		{
-			return idtable.table[lextable.table[i].idxTI].iddatatype;
+			return idtable.table[lextable.table[i].idxTI].iddatatype;//возвраш наг тип
 		}
 	}
 }
@@ -358,21 +356,6 @@ void Gener::LogicOperations(std::ofstream& AsmFile, char lex, int sn)
 
 		break;
 	}
-	case LEX_LEFTBITWISE:
-	{
-		AsmFile << "pop ebx" << std::endl
-			<< "pop eax" << std::endl << "shl eax, cl" << std::endl << "push eax" << std::endl
-			<< "jc OVERFLOW\n";
-		break;
-	}
-	case LEX_RIGHTBITWISE:
-	{
-		AsmFile << "pop ebx" << std::endl
-			<< "pop eax" << std::endl << "sar eax, cl" << std::endl << "push eax" << std::endl
-			<< "jc OVERFLOW\n";
-		break;
-	}
-
 	case LEX_NOTEQUAL:
 	{
 		AsmFile << "je SKIP" << sn << "\n";

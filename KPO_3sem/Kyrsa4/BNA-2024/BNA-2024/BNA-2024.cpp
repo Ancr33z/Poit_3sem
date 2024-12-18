@@ -45,7 +45,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		}
 
 		MFST::Mfst mfst(lextable, GRB::getGreibach(), parm.out);
-		LA::ShowIDtable(idtable, &mfst.outfile);
+		LA::ShowIDtable	(idtable, &mfst.outfile);
 		LA::ShowLexTable(lextable, &mfst.outfile);
 		MFST_TRACE_START(mfst.outfile);
 		bool syntaxAnaliz = mfst.start(*log.stream);
@@ -54,7 +54,6 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		if (!syntaxAnaliz)
 		{
 			*log.stream << "Синтаксический анализ выполнен с ошибками\n";
-			return 1;
 		}
 		mfst.outfile << "\nСинтаксический анализ окончен\n";
 		semanticErrors += SeAn::CheckingReturnInMain(lextable, idtable, log);
@@ -80,7 +79,8 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		else {
 			*log.stream << "Генерация кода выполнена успешно\n";
 		}
-		PN::PolishNotation(lextable, idtable, &mfst.outfile);
+		const bool pnTRUEFALSE =  PN::PolishNotation(lextable, idtable, &mfst.outfile);
+		std::cout << pnTRUEFALSE << std::endl;
 		LA::ShowLexTable(lextable, &mfst.outfile);
 		Gener::CodeGeneration(lextable, idtable);
 		mfst.outfile.close();
@@ -92,5 +92,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
 
 		Log::WriteError(log, e);
 	}
+	system("PAUSE");
 	return 0;
+
 }

@@ -28,13 +28,11 @@ FST::NODE())
 
 
 #pragma region STRING
-#define FST_STRING FST::FST(7,\
-FST::NODE(1, FST::RELATION('s', 1)),\
-FST::NODE(1, FST::RELATION('t', 2)),\
-FST::NODE(1, FST::RELATION('r', 3)),\
-FST::NODE(1, FST::RELATION('i', 4)),\
-FST::NODE(1, FST::RELATION('n', 5)),\
-FST::NODE(1, FST::RELATION('g', 6)),\
+#define FST_STRING FST::FST(5,\
+FST::NODE(1, FST::RELATION('c', 1)),\
+FST::NODE(1, FST::RELATION('h', 2)),\
+FST::NODE(1, FST::RELATION('a', 3)),\
+FST::NODE(1, FST::RELATION('r', 4)),\
 FST::NODE())
 #pragma endregion
 
@@ -79,13 +77,12 @@ FST::NODE())
 
 
 #pragma region out
-#define FST_PRINT FST::FST(7,\
-FST::NODE(1, FST::RELATION('o', 1)),\
-FST::NODE(1, FST::RELATION('u', 2)),\
-FST::NODE(1, FST::RELATION('t', 3)),\
-FST::NODE(1, FST::RELATION('p', 4)),\
-FST::NODE(1, FST::RELATION('u', 5)),\
-FST::NODE(1, FST::RELATION('t', 6)),\
+#define FST_PRINT FST::FST(6,\
+FST::NODE(1, FST::RELATION('w', 1)),\
+FST::NODE(1, FST::RELATION('r', 2)),\
+FST::NODE(1, FST::RELATION('i', 3)),\
+FST::NODE(1, FST::RELATION('t', 4)),\
+FST::NODE(1, FST::RELATION('e', 5)),\
 FST::NODE())
 #pragma endregion
 
@@ -150,7 +147,7 @@ FST::NODE())
 
 #pragma region LEFTBITWISE
 #define FST_LEFTBITWISE FST::FST(2,\
-FST::NODE(1, FST::RELATION('@', 1)),\
+FST::NODE(1, FST::RELATION('?', 1)),\
 FST::NODE())
 #pragma endregion
 

@@ -13,10 +13,10 @@
 "EXTRN random: PROC \n"\
 "EXTRN toPow: PROC\n"\
 "EXTRN strLength: PROC\n"\
-"EXTRN outstr: PROC\n"\
-"EXTRN outnum: PROC\n"\
-"EXTRN outnumline: PROC\n"\
-"EXTRN outstrline: PROC\n"\
+"EXTRN writestr: PROC\n"\
+"EXTRN writenum: PROC\n"\
+"EXTRN writenumline: PROC\n"\
+"EXTRN writestrline: PROC\n"\
 "EXTRN system_pause:PROC\n"\
 ".stack 4096\n"
 

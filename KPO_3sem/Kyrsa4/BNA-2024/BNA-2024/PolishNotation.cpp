@@ -125,7 +125,7 @@ namespace PN
 		}
 	}
 
-	void PolishNotation(LT::LexTable& lexTable, IT::IdTable& idTable, std::ofstream* outfile)
+	bool PolishNotation(LT::LexTable& lexTable, IT::IdTable& idTable, std::ofstream* outfile)
 	{
 		*outfile << "\n\t\tPolish Notation:\n";
 		Check check;
@@ -143,6 +143,7 @@ namespace PN
 				DelNULLEntryLT(lexTable, idTable, numConver,sizeExpr,endExpr);
 			}
 		}
+		return true;
 	}
 }
 
